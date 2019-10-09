@@ -1,7 +1,0 @@
-"0","# find model for best Cp"
-"0","which.min(t.fwd.summary$cp)"
-"1","[1]"
-"1"," 10"
-"1","
-"
-"0","plot(t.fwd.summary$cp, xlab = ""Subset Size"", ylab = ""Cp"", col = ""blue"", pch = 2, type = ""l"")"

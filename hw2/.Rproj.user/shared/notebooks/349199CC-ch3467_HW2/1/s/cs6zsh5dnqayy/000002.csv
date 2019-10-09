@@ -1,6 +1,0 @@
-"0","College.lm = lm(Apps~., data=College.train)"
-"0","mean((College.test$Apps - predict(College.lm, College.test) )^2)"
-"1","[1]"
-"1"," 1135758"
-"1","
-"

@@ -1,2 +1,0 @@
-"0","points(which.min(t.fwd.summary$cp), t.fwd.summary$cp[which.min(t.fwd.summary$cp)],"
-"0","       pch = 2, col = ""red"", lwd = 2)"

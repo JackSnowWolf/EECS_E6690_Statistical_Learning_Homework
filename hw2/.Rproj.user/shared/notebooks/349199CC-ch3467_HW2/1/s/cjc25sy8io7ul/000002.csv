@@ -1,8 +1,0 @@
-"0","# load College data set."
-"0","College.df <- read.csv(""College.csv"", header = T, row.names=1)"
-"0","# check na"
-"0","sum(is.na(College))"
-"1","[1]"
-"1"," 0"
-"1","
-"

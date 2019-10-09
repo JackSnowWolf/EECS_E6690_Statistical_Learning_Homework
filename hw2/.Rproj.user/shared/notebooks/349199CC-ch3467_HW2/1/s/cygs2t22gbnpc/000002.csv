@@ -1,3 +1,0 @@
-"0","set.seed(1)"
-"0","x = rnorm(100)"
-"0","epsilon = rnorm(100)"

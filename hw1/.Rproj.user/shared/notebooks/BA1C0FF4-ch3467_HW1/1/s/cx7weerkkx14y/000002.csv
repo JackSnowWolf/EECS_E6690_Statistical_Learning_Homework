@@ -1,2 +1,0 @@
-"0","Auto.df <- read.csv(""Auto.csv"", header=T, na.strings=""?"")"
-"0","Auto.df <- na.omit(Auto.df)"

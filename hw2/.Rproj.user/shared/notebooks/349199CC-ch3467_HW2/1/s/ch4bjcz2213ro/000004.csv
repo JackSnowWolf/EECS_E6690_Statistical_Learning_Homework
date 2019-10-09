@@ -1,6 +1,0 @@
-"0","ridge.pred = predict(College.ridge, newx=test_mat, s=College.ridge$lambda.min)"
-"0","mean((College.test[, ""Apps""] - ridge.pred)^2)"
-"1","[1]"
-"1"," 976261.5"
-"1","
-"

@@ -1,7 +1,0 @@
-"0","x_mat2 <- model.matrix(y ~ poly(x, 10, raw = T), data = t2.df)[, -1]"
-"0","t2.cv <-cv.glmnet(x_mat2, y, alpha = 1)"
-"0","t2.cv$lambda.min"
-"1","[1]"
-"1"," 0.09072803"
-"1","
-"

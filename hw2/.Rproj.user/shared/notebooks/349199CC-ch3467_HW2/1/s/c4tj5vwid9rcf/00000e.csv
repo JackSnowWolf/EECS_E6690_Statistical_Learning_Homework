@@ -1,7 +1,0 @@
-"0","# find model for best Adjusted R"
-"0","which.max(t.bwd.summary$adjr2)"
-"1","[1]"
-"1"," 3"
-"1","
-"
-"0","plot(t.bwd.summary$adjr2, xlab = ""Subset Size"", ylab = ""adj R2"", col = ""blue"", pch = 2, type = ""l"")"

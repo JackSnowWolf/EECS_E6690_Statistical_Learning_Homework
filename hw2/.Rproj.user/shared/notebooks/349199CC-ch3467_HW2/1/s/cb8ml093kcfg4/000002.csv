@@ -1,4 +1,0 @@
-"0","library(leaps)"
-"0","t.df <- data.frame(y = y, x = x)"
-"0","t.full<-regsubsets(y ~ poly(x, 10, raw = T), data=t.df, nvmax = 10)"
-"0","t.summary = summary(t.full)"

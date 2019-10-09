@@ -1,4 +1,0 @@
-"0","train_mat <- model.matrix(Apps ~ ., data = College.train)"
-"0","test_mat <-  model.matrix(Apps ~ ., data = College.test)"
-"0","College.ridge = cv.glmnet(train_mat, College.train$Apps, alpha = 0)"
-"0","plot(College.ridge)"

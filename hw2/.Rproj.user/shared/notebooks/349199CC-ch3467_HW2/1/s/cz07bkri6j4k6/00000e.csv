@@ -1,7 +1,0 @@
-"0","# find model for best BIC"
-"0","which.min(t.fwd.summary$bic)"
-"1","[1]"
-"1"," 5"
-"1","
-"
-"0","plot(t.fwd.summary$bic, xlab = ""Subset Size"", ylab = ""BIC"", col = ""blue"", pch = 2, type = ""l"")"

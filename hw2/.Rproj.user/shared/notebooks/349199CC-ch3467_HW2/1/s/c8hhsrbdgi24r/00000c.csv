@@ -1,2 +1,0 @@
-"0","points(which.max(t.summary$adjr2), t.summary$adjr2[which.max(t.summary$adjr2)],"
-"0","       pch = 2, col = ""red"", lwd = 2)"

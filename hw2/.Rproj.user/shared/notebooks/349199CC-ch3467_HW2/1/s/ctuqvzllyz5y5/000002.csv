@@ -1,7 +1,0 @@
-"0","set.seed(1)"
-"0","train = sample(1: 1000, 100)"
-"0","test = (-train)"
-"0","X_mat.train = X_mat[train, ]"
-"0","X_mat.test = X_mat[test, ]"
-"0","Y.train = Y[train, ]"
-"0","Y.test = Y[test, ]"

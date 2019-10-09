@@ -1,7 +1,0 @@
-"0","beta_err = rep(NA, p)"
-"0","x_cols = colnames(X_mat, do.NULL = FALSE, prefix = ""x."")"
-"0","for(i in 1:p){"
-"0","  c_i = coef(d.full, id = i)"
-"0","  beta_err[i] = sqrt(sum((Beta[x_cols %in% names(c_i)] - c_i[names(c_i) %in% x_cols])^2))"
-"0","}"
-"0","plot(x = 1:p, y = beta_err, xlab = ""Subset Size"", ylab = ""Error Between Estimated and True Coefficients"")"
