@@ -1,0 +1,571 @@
+---
+title: "Ve406 Project"
+author: "Hu Chong 515370910114"
+date: 'Due: __3 August 2018, 5:00pm__'
+output: 
+  pdf_document:
+    dev: png
+
+---
+
+#Task 1
+
+```{r include=FALSE}
+path <- "airbnb"
+fileNames <- dir(path)
+filePath <- sapply(fileNames, function(x){
+  paste(path, x, sep = '/')
+})
+inputData <- lapply(filePath, function(x){
+             result = read.csv(x, sep=",", header=T)
+             })
+#
+#  str = strsplit(x, '/')
+#             str_list = strsplit(str[[1]][2], '_')[[1]]
+#             if (length(str_list)==3) city = str_list[1]
+#             else 
+#               city = paste(str_list[1],str_list[2],sep='_')
+#             result$city = city
+#             return(result)
+#
+```
+
+## Data Processing
+
+```{r include=FALSE}
+task1Data = inputData[1:10]
+processedData = task1Data[[1]]
+vnames = names(task1Data[[1]])
+for(i in 2:10)
+{
+  processedData <- rbind(processedData,task1Data[[i]][c(vnames)])
+}
+```
+
+```{r echo = FALSE}
+processedData[["neighborhood"]] = as.factor(processedData[["neighborhood"]])
+processedData[["last_modified"]] = unclass(as.Date(processedData[["last_modified"]]))
+str(processedData)
+summary(processedData)
+boxplot(processedData$accommodates, main = "accommodates" )
+boxplot(processedData$bedrooms, main = "bedrooms")
+boxplot(processedData$minstay, main = "minstay")
+boxplot(processedData$price, main = "price")
+```
+```{r echo=FALSE}
+processedData = processedData[-which(processedData[["price"]]>2000),]
+processedData = processedData[-which(is.na(processedData[["bedrooms"]])),]
+processedData = processedData[-which(is.na(processedData[["last_modified"]])),]
+```
+
+In this part, we can't see any extreme value from `accommodates`, `minstay`, `bedrooms` and other variables except `price`, by using the function `str`, `summary` and boxplots. However, the two extreme high values in the `price` boxplot should be outlier in this part of dataset. So I delete those two points from the dataset. For the other variables, `reviews`, `longitude` and `latitude` should be useless to explain price inside a city, so the data processing does not focus on those variables. And because the amount of `NA` in the `minstay` is so large that this variable might not be used as predictor. So I only consider those two points as outliers in this step. Also, since there are quite few data with `NA` bedrooms, I delete those data in order to use `bedrooms` as a predictor. Besides, I only use the date in `last_modified` as a number in days to reduce the computational complexity. It will give the days from last modified time to the standard day. I also remove `NA` produced in this step.
+
+```{r echo = FALSE}
+boxplot(price~room_type, processedData, main  = "price")
+tmp1 = processedData[which(processedData[["price"]]>200 &
+                             processedData[["room_type"]]=="Shared room"),]
+tmp2 = processedData[which(processedData[["price"]]>400 &
+                             processedData[["room_type"]]=="Private room"),]
+tmp3 = processedData[which(processedData[["price"]]>500 &
+                             processedData[["room_type"]]=="Entire home/apt"),]
+head(tmp1);head(tmp2);head(tmp3)
+```
+
+After deleting the outliers, I keep finding whether there are potential issue with `price`. So I plot the `price` versus `room_type` and select those relative high value in those three types. However, I do not have strong evidence to show that those points are outliers or their prices are recorded in another form. The large `price` value for different types don't show any similiarities in edited time. So I remain those points in the dataset.
+
+## Model
+
+```{r echo = FALSE}
+dataTask1.df = processedData[sample(nrow(processedData),nrow(processedData), 
+                                    replace = F),]
+
+```
+
+In this task, our main object is to explain `price` using other variables for a city of our choice. So at the beginning, we use the linear regression model so that we can explain better. In order to aviod the potential time related issue may affect the result, I random the whole dataset. Besides, I use `log(price)` as response to deal with the long tail of the `price`.
+
+```{r echo  = FALSE}
+dataTask1.LM = lm(log(price) ~ room_type + neighborhood + accommodates 
+                  + bedrooms + last_modified , data = dataTask1.df)
+```
+
+```{r echo = FALSE}
+res = dataTask1.LM$residuals
+fit = dataTask1.LM$fitted.values
+plot(dataTask1.LM, which = 1)
+
+vnames = names(dataTask1.df)
+for(i in c(3,5, 8,9,14))
+{
+  plot (dataTask1.df[[vnames[i]]], res,
+      xlab = vnames [i], ylab = "Residual",
+      main = bquote ("Residual Vs"~.( vnames[i])))
+  #lines(lowess(res,dataTask1.df[[vnames[i]]]), col = "red")
+  
+}
+
+qqnorm(res); qqline(res, col = "red")
+plot ( res [-nrow (dataTask1.df)], res[-1],
+       main = "Residual Vs Previous Residual",
+       ylab = "Residual", xlab = "Previous Residual")
+lines(lowess(res [-nrow (dataTask1.df)], res[-1]), col = "red")
+
+acf(res)
+```
+
+
+```{r echo = FALSE}
+summary(dataTask1.LM)
+```
+In this question, our main object is to explain `price` by using predictors of my choice. So, I would like to first use `lm` explain the rough relationships between predictors and response. Although there are some defects in this model, it is not too bad to explain the relationships due to the zero mean for residual versus predictors and residual versus fitted value. However, linear regression model is hard to keep variance of residual inside a constant range, so I will change to `glm` and `gam` after explaining. From `Previous` versus `residuals` plot and acf plot, we can see that residuals are uncorrelated.
+
+From the summary of the linear regression model, we can clearly see that all the variables I choosed are needed in this model. For other variable `borough` and `minstay`, they have too many `NA` inside. For the other  variables, they are useless in explainin `price` inside one city, like `reviews`, `longitude`  and `latitdue`. From the `residuals` versus `predictors` and `residuals` versus `fitted value`, we can not see there exist any evidence to show non-zero mean. However, from `residuals` versus `accommodates` and `residuals` versus `bedrooms` plots, it is obvious that the variances of `residual` are not constants. However, it is not easy to fix using simple linear regression model. So I will use `gam` or `glm` after this part of explaining.
+
+We can also see this model could only explain 44.1% of the variety in residual, which also shows the necessarity of refiting the data using `gam` or `glm`. With other variables equal to zero, the expected mean of `price` is -0.98 in `log` scale; with room type `Private room`, the expected mean of `price` is -1.323 in `log` scale; with room type `Shared room`, the expected mean of `price` is -1.687 in `log` scale. In different region, the factor `neighborhood` will provid a small difference.  For variable `accommodates`, with a unit increase in `log` scale, the expected mean of `price` will increase 0.102 in `log` scale. For variable `bedrooms`, with a unit increase, the expected mean of `price` will increase 0.126 in `log` scale. For variable `last_modified `, with a unit increase, the expected mean of `price` will increase a small amout 2.7*10^-4 in `log` scale. 
+
+```{r echo  = FALSE}
+dataTask1.pois = glm(price ~ room_type + neighborhood + accommodates 
+                  + bedrooms + last_modified , family = poisson, data = dataTask1.df)
+```
+
+
+```{r echo = FALSE}
+res = residuals(dataTask1.pois, type = "pearson")
+fit = dataTask1.pois$fitted.values
+plot(dataTask1.pois, which = 1)
+
+```
+
+```{r echo = FALSE}
+dataTask1.inv.GAM = gam(log(price)~room_type + neighborhood + s(accommodates) 
+                  + s(bedrooms) + last_modified, family = Gamma(link = "inverse"), 
+                  data = dataTask1.df)
+dataTask1.log.GAM = gam(log(price) ~ room_type + neighborhood + s(accommodates) 
+                  + s(bedrooms) + last_modified , family  = Gamma (link = "log"), 
+                  data = dataTask1.df)
+
+```
+
+```{r echo  =FALSE}
+res.inv.df = data.frame (cond_m = fitted (dataTask1.inv.GAM),
+                         pear_r = residuals(dataTask1.inv.GAM, type = "pearson"))
+with(res.inv.df, plot(cond_m, pear_r, main = "inv.GAM Residual Plot ",
+                       cex.lab = 1.5 , cex.main = 2))
+
+with(res.inv.df, lines (smooth.spline(cond_m, pear_r), 
+     col = "red", lty = 2, lwd = 2))
+
+res.log.df = data.frame (cond_m = fitted (dataTask1.log.GAM),
+                         pear_r = residuals(dataTask1.log.GAM, type = "pearson"))
+with(res.log.df, plot(cond_m, pear_r, main = "log.GAM Residual Plot ",
+                       cex.lab = 1.5 , cex.main = 2))
+
+with(res.log.df, lines (smooth.spline(cond_m, pear_r), 
+     col = "red", lty = 2, lwd = 2))
+
+```
+
+
+
+```{r echo = FALSE}
+summary(dataTask1.pois)
+summary(dataTask1.inv.GAM)
+summary(dataTask1.log.GAM)
+```
+
+From previous analysis, it looks like `GAM` using log function as gamma link function will provid lower `AIC` value and this model is better from those `residual` versus `fitted value` intuitively. There are also no evidence to show any predictors in this model are not needed. However, in this model, it is hard to explain the relationship between `predictors`  and  `response`. And the residual plot is even worse then the `lm` model. Therefore, I decide to remove those outliers in the residual plot since there might be some price in different scale.
+
+```{r echo = FALSE}
+dataTask1.rm.df = dataTask1.df[-which(res.log.df$pear_r>0.4),]
+dataTask1.rm.log.GAM = gam(log(price) ~ room_type 
+                           + neighborhood + s(accommodates,df = 5) 
+                  + s(bedrooms,df = 4) + last_modified , 
+                  family  = Gamma (link = "log"), 
+                  data = dataTask1.rm.df)
+
+res.rm.log.df = data.frame (cond_m = fitted (dataTask1.rm.log.GAM),
+                         pear_r = residuals(dataTask1.rm.log.GAM, type = "pearson"))
+with(res.rm.log.df, plot(cond_m, pear_r, main = "log.GAM Residual Plot ",
+                       cex.lab = 1.5 , cex.main = 2))
+
+with(res.rm.log.df, lines (smooth.spline(cond_m, pear_r), 
+     col = "red", lty = 2, lwd = 2))
+acf(res.rm.log.df$pear_r)
+qqnorm(res.rm.log.df$pear_r);qqline(res.rm.log.df$pear_r, col = "red")
+summary(dataTask1.rm.log.GAM)
+```
+
+
+
+```{r echo = FALSE}
+fit = res.rm.log.df$cond_m
+
+vnames = names(dataTask1.df)
+for(i in c(3,5, 8,9,14))
+{
+  plot (dataTask1.rm.df[[vnames[i]]], fit,
+      xlab = vnames [i], ylab = "Fitted value",
+      main = bquote ("Fitted value Vs"~.( vnames[i])))
+  if (i > 5 ) lines(lowess(dataTask1.rm.df[[vnames[i]]], fit), col = "red")
+}
+
+summary(dataTask1.rm.df)
+```
+
+After removing some outliers, we can clearly see the residual plot becomes much better. However, the qqplot shows that residuals are somehow deformed from normal distribution. From the `fitted value` versus different `predictors`, we can find some trend between them. For variable `room_type` and `neightborhood`, the relationships are quite messy. For `accommodates`, we can see fitted value increases as accommodates increase until the certain value, the increase relationship disappears. For `bedrooms`, there also exist a clear increasing relationship. For `last_modified`, we could only see a sight increasing relationship. As for explaining, it is better to using simple linear regression model. And we can also see some of same result we could also get here. But we can not using this `GAM` to analysis quantitatively.
+
+# Task2
+
+In this part, the objective is to predict price using all available information I can gather. So, I will keep analysising data based on the result I get from previous part.
+
+## Data Processing
+
+Due the some issue of my own PC, it is hard to handle all the data in the dataset. So, I random choose several cities in the dataseta and input all the data of corresponding city. Since there are a lot of cities, it is unwise to add a factor variable `city` in all the input data. So I only use some other variables as properties of a city. And I delete all the data with `NA`. Another process is that I calculated the average of `review` for a city as an indicator of visitors for a city and add it into the dataset.
+
+```{r echo = FALSE}
+split_name <- function(x)
+{
+  str_list = strsplit(names(x), '_')[[1]]
+             if (length(str_list)==3) city = str_list[1]
+             else 
+               city = paste(str_list[1],str_list[2],sep='_')
+             return(city)
+}
+```
+
+
+```{r include=FALSE}
+task2Data = inputData
+vnames = names(task2Data[[1]])
+data2 = c()
+tmp_list = c()
+prev_city = split_name(task2Data[1])
+for(i in 1:length(task2Data))
+{
+  
+  curr_city = split_name(task2Data[i])
+  task2Data[[i]] = task2Data[[i]][c(vnames)]
+
+  if(curr_city != prev_city | i == length(task2Data) )
+  {
+    if(i == length(task2Data)) tmp_list = c(tmp_list, task2Data[i])
+    tmp_result = tmp_list[[1]]
+    if(length(tmp_list) >1)
+    {
+      for(j in 2:length(tmp_list))
+      {
+        tmp_result = rbind(tmp_result, tmp_list[[j]])
+      }
+    }
+    
+    tmp_list = c()
+    tmp_result[["neighborhood"]] = as.factor(tmp_result[["neighborhood"]])
+    tmp_result[["reviews"]] = as.numeric(tmp_result[["reviews"]])
+    
+    pos_na = c()
+    for(k in 7:14)
+    {
+      pos_na = c(pos_na, which(is.na(tmp_result[[k]])))
+    }
+    tmp_result = tmp_result[-pos_na,]
+    if(nrow(tmp_result) > 0 )
+    {
+      avg_reviews = sum(tmp_result[["reviews"]])/length(tmp_result[["reviews"]])
+      tmp_result$avg_reviews = avg_reviews
+      tmp_result$city = prev_city
+      tmp_result = as.data.frame(tmp_result)
+      data2[[prev_city]] = tmp_result
+    }
+    
+  }
+  prev_city = curr_city
+  tmp_list = c(tmp_list, task2Data[i])
+  
+}
+
+```
+
+The data process is a very boring step. For concenvience, I also delete the cities with only a small amout of data left. Somehow, this step may get cities with kind of same properities. So, I will analysis dataset under this condition. Due the computational issuw, I have to make the dataset small enough so that my PC could run the model. After all those steps, there are about 360000 in the dataset. 
+
+```{r include=FALSE}
+dataTask2.df = data2[[2]]
+for(j in 3:length(data2))
+{
+  if(nrow(data2[[j]]) > 1000 & nrow(data2[[j]]) < 50000)
+  {
+    dataTask2.df = rbind(dataTask2.df, data2[[j]])
+  } 
+}
+
+dataTask2.df =
+  dataTask2.df[which(dataTask2.df[["room_type"]] == "Entire home/apt"
+               | dataTask2.df[["room_type"]] == "Private room"
+               | dataTask2.df[["room_type"]] == "Shared room"),]
+dataTask2.df[["bedrooms"]] = as.numeric(dataTask2.df[["bedrooms"]])
+dataTask2.df[["minstay"]] = as.numeric(dataTask2.df[["minstay"]])
+dataTask2.df[["overall_satisfaction"]] =
+  as.numeric(dataTask2.df[["overall_satisfaction"]])
+dataTask2.df[["accommodates"]] = as.numeric(dataTask2.df[["accommodates"]])
+dataTask2.df[["price"]] = as.numeric(dataTask2.df[["price"]])
+dataTask2.df[["latitude"]] = as.numeric(dataTask2.df[["latitude"]])
+dataTask2.df[["longitude"]] = as.numeric(dataTask2.df[["longitude"]])
+```
+
+```{r echo = FALSE}
+dataTask2.df = dataTask2.df[-which(is.na(dataTask2.df[["minstay"]])),]
+dataTask2.df = dataTask2.df[-which(is.na(dataTask2.df[["avg_reviews"]])),]
+```
+
+```{r echo = FALSE}
+boxplot(dataTask2.df$accommodates, main = "accommodates" )
+boxplot(dataTask2.df$bedrooms, main = "bedrooms")
+boxplot(dataTask2.df$minstay, main = "minstay")
+boxplot(dataTask2.df$price, main = "price")
+
+```
+
+
+From the boxplots, we can see that there some outliers in `minstay` and `price`. So I remove those points. Besides, I randomlize the dataset before I run the model. Here I use all the predictors I could use here, `room_type`, `city`, `accommodates`, `bedrooms`, `avg_reviews`, `minstay`, `overall_satisfaction`
+
+```{r echo = FALSE}
+dataTask2.df = dataTask2.df[-which(dataTask2.df[["minstay"]]>200),]
+dataTask2.df = dataTask2.df[-which(dataTask2.df[["price"]]>4000),]
+```
+
+
+```{r echo = FALSE}
+dataTask2.df[["overall_satisfaction"]] =
+  as.factor(dataTask2.df[["overall_satisfaction"]])
+dataTask2.df[["city"]] = as.factor(dataTask2.df[["city"]])
+
+```
+## Model
+```{r include=FALSE}
+dataTask2.df = dataTask2.df[sample(nrow(dataTask2.df),nrow(dataTask2.df), 
+                                    replace = F),]
+
+
+dataTask2.norm.GAM = gam(log(price)~room_type + city + s(accommodates) 
+                  + s(bedrooms) + s(avg_reviews) + s(minstay)
+                  + overall_satisfaction, 
+                  data = dataTask2.df)
+dataTask2.inv.GAM = gam(log(price)~room_type + city + s(accommodates) 
+                  + s(bedrooms) +s(avg_reviews)+ s(minstay)
+                  + overall_satisfaction, family = Gamma(link = "inverse"), 
+                  data = dataTask2.df)
+dataTask2.log.GAM = gam(log(price) ~ room_type + city + s(accommodates) 
+                  + s(bedrooms) + s(avg_reviews) + s(minstay)
+                  + overall_satisfaction, family  = Gamma (link = "log"), 
+                  data = dataTask2.df)
+
+```
+
+```{r echo = FALSE}
+
+summary(dataTask2.norm.GAM)
+summary(dataTask2.inv.GAM)
+summary(dataTask2.log.GAM)
+
+```
+
+Here I use `GAM` as model to predict `price` based on the experience from the previous question. Due the computational problem, I can not add `neighborhood` into the model, which may increase the computational complexity largerly. The longitude and laitude are proved not useful after my trial. Here I use three types of link function, normal, inverse and log. The normal gam model is the best in AIC. Therefore, the `GAM` model with normal as link function is better than the other one. Except variable `avg_reviews`, all the other predictors are needed as we can see from the summary. Since the variable `avg_reviews` is somehow the property of a city. Those two variables are some repeated, which make it reasonable.
+
+```{r echo = FALSE}
+dataTask2.norm.GAM = gam(log(price) ~ room_type + city + s(accommodates) 
+                  + s(bedrooms) + s(minstay)
+                  + overall_satisfaction, 
+                  data = dataTask2.df)
+res.norm.df = data.frame (cond_m = fitted (dataTask2.norm.GAM),
+                         pear_r = residuals(dataTask2.norm.GAM, type = "pearson"))
+with(res.norm.df, plot(cond_m, pear_r, main = "norm.GAM Residual Plot ",
+                       cex.lab = 1.5 , cex.main = 2))
+
+with(res.norm.df, lines (smooth.spline(cond_m, pear_r), 
+     col = "red", lty = 2, lwd = 2))
+fit = dataTask2.norm.GAM$fitted.values
+
+vnames = names(dataTask2.df)
+for(i in c(7, 8,9))
+{
+  plot (dataTask2.df[[vnames[i]]], fit,
+      xlab = vnames [i], ylab = "Fitted value",
+      main = bquote ("Fitted value Vs"~.( vnames[i])))
+  if (i > 5 ) lines(lowess(dataTask2.df[[vnames[i]]], fit), col = "red")
+}
+qqnorm(res.norm.df$pear_r);qqline(res.norm.df$pear_r)
+acf(res.norm.df$pear_r)
+```
+From those plots, we can see that this GAM with normal as link function is reasonable. The residual plot is somehow better than the other models. It is only reject the residual has a constant variance.  Hence, I have to check whether the model could provide 
+
+After I test `GLM` model with poission function, the result is even worse than the previous. (the `GLM` model is not shown here for convenience ) So I finally use the `GAM` model instead of `GLM` model. Since I don't recognize price in different form when I process data, I will somehow fix this issue to make residual still within a constant variance.
+
+```{r echo = FALSE}
+dataTask2.rm.df = dataTask2.df
+for (i in 1:length(dataTask2.df[["price"]]))
+{
+  if(dataTask2.rm.df[["price"]][i] > 1200) 
+  {
+    dataTask2.rm.df[["price"]][i] = dataTask2.df[["price"]][i]/30
+  }
+  
+}
+
+dataTask2.rm.df = dataTask2.rm.df[-which(abs(res.norm.df$pear_r)>2),]
+```
+
+```{r echo = FALSE}
+dataTask2.norm.GAM = gam(log(price) ~ room_type + city + s(accommodates) 
+                  + s(bedrooms) + s(minstay)
+                  + overall_satisfaction, 
+                  data = dataTask2.rm.df)
+res.norm.df = data.frame (cond_m = fitted (dataTask2.norm.GAM),
+                         pear_r = residuals(dataTask2.norm.GAM, type = "pearson"))
+with(res.norm.df, plot(cond_m, pear_r, main = "norm.GAM Residual Plot ",
+                       cex.lab = 1.5 , cex.main = 2))
+
+with(res.norm.df, lines (smooth.spline(cond_m, pear_r), 
+     col = "red", lty = 2, lwd = 2))
+fit = dataTask2.norm.GAM$fitted.values
+
+vnames = names(dataTask2.rm.df)
+
+qqnorm(res.norm.df$pear_r);qqline(res.norm.df$pear_r)
+acf(res.norm.df$pear_r)
+```
+The model could be improved in some degree, but overall performance is not good. I have already test many methods, but the other models are even worse than this version. So I just use this model to predict.
+By using the function `predict`, we could use this model to predict.
+
+# Task3
+
+In this task, objective is to understand what affect the number of reviews of a given list. Basically, I will continue investigating on the data set I get from the previous part. My strategy is run the `GLM` or `GAM` model using `reviews` as reponse and using other variables as predictors so that I could find whether a variable could affect `reviews` and how it will affect `reviews`. Based on my test, the `GAM` with log function as link function has smaller AIC than other model like `GLM` and other `GAM` models.
+
+
+
+```{r echo = FALSE}
+dataTask3.log.GAM = gam((reviews+1) ~ room_type + city + s(accommodates, df = 6) 
+                  + s(bedrooms, df = 6) + s(price, df = 12) + s(minstay, df = 6)
+                  + overall_satisfaction, family  = Gamma (link = "log"), 
+                  data = dataTask2.df)
+
+
+```
+
+```{r echo  = FALSE}
+summary(dataTask3.log.GAM)
+```
+
+From the summary of `GAM` model, we can clearly see that all the predictors I use here will affect `reviews`. However, under `GAM` model, it is hard to explain the exact relationship between `reviews` and other predictors. I will plot `fitted value` versus predictors and roughly descripe the relationship.
+
+```{r echo = FALSE}
+
+res.log.df = data.frame (cond_m = fitted (dataTask3.log.GAM),
+                         pear_r = residuals(dataTask3.log.GAM, type = "pearson"))
+with(res.log.df, plot(cond_m, pear_r, main = "log.GAM Residual Plot ",
+                       cex.lab = 1.5 , cex.main = 2))
+
+with(res.log.df, lines (smooth.spline(cond_m, pear_r), 
+     col = "red", lty = 2, lwd = 2))
+fit = dataTask3.log.GAM$fitted.values
+
+vnames = names(dataTask2.df)
+for(i in c(7, 8,9,10))
+{
+  plot (dataTask2.df[[vnames[i]]], fit,
+      xlab = vnames [i], ylab = "Fitted value",
+      main = bquote ("Fitted value Vs"~.( vnames[i])))
+  if (i > 5 ) lines(lowess(dataTask2.df[[vnames[i]]], fit), col = "red")
+}
+qqnorm(res.log.df$pear_r);qqline(res.log.df$pear_r, col = "red")
+acf(res.log.df$pear_r)
+```
+
+From those plots, we can see a rought trend that `reviews` changes as `predictors`. However, from the residual plot, it is not exactly what I want. As the previous part, I alway test other models like `GLM` and `GAM` using other link function. However, all of them  can't solve this problem and this version is already the best in all of my trials. I just feel despair about this. I also try to revise the dataset, but nothing happened. But I can still try to explain the relationship between `reviews` and other variables. For `overall_satisfaction`, the `reviews` increases as the `overall_satisfaction` becomes better.
+
+
+
+
+# Task4
+
+The objective of this task is to predict whether a list will have any review or not. So I keep use the same dataset and make `revies` as a factor, 0 for no reviews and 1 for more than zero reviews. Notice that I remove all the data with reviews `NA`. In this dataset, amount of zero and amout of more than zero value are not balanced, I don't know whether it is common in all data.   
+
+```{r echo = FALSE}
+dataTask4.df = data2[[2]]
+for(j in 3:50)
+{
+  if(nrow(data2[[j]]) < 5000)
+  {
+    dataTask4.df = rbind(dataTask4.df, data2[[j]])
+  } 
+}
+
+dataTask4.df =
+  dataTask4.df[which(dataTask4.df[["room_type"]] == "Entire home/apt"
+               | dataTask4.df[["room_type"]] == "Private room"
+               | dataTask4.df[["room_type"]] == "Shared room"),]
+dataTask4.df[["bedrooms"]] = as.numeric(dataTask4.df[["bedrooms"]])
+dataTask4.df[["accommodates"]] = as.numeric(dataTask4.df[["accommodates"]])
+dataTask4.df[["price"]] = as.numeric(dataTask4.df[["price"]])
+```
+
+
+
+```{r echo = FALSE}
+dataTask4.df[["overall_satisfaction"]] =
+  as.factor(dataTask4.df[["overall_satisfaction"]])
+dataTask4.df[["city"]] = as.factor(dataTask4.df[["city"]])
+
+```
+
+```{r echo = FALSE}
+
+
+for(i in 1:nrow(dataTask4.df))
+{
+  if(dataTask4.df[["reviews"]][i] > 0)
+  {
+    dataTask4.df[["reviews"]][i] = 1
+  } 
+}
+dataTask4.df[["reviews"]] = as.factor(dataTask4.df[["reviews"]])
+
+
+
+```
+
+
+
+
+```{r include=FALSE}
+dataTask4.LG = glm( reviews ~ room_type + city + s(accommodates, df = 6) 
+                  + s(bedrooms, df = 6) + s(price, df = 12)
+                  + overall_satisfaction, family  = binomial, 
+                  data = dataTask4.df)
+```
+
+```{r echo = FALSE}
+
+summary(dataTask4.LG)
+
+```
+
+From the summary, we can see that some variables are not useful to predict whether a list will have any review or not. The factor variable city is useful in some part. `overall_satisfaction` is not usefull in all aspects. So I remove this variable from the model. Variables `accommodates`, `bedrooms` and `price` are needed based on the summary.
+ 
+```{r echo = FALSE}
+dataTask4.LG = glm( reviews ~ room_type + city + s(accommodates, df = 6) 
+                  + s(bedrooms, df = 6) + s(price, df = 12),
+                  family  = binomial, 
+                  data = dataTask4.df)
+summary(dataTask4.LG)
+
+```
+
+```{r echo = FALSE}
+hoslem.test(dataTask4.LG$y, fitted (dataTask4.LG))
+```
+From Hosmer-Lemeshow test, the p-value is good. Therefore, we can believe that this model is good enough. Since in my dataset, the zero review points are relatively smaller the more than one review points, it might affect the model. By using this model with function `predict`, we can predict whether a list will have any review or not.
+
+
+
+
+
+
+

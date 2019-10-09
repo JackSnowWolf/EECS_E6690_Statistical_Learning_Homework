@@ -1,0 +1,6 @@
+"0","lasso.pred = predict(College.lasso, newx=test_mat, s=College.lasso$lambda.min)"
+"0","mean((College.test[, ""Apps""] - lasso.pred)^2)"
+"1","[1]"
+"1"," 1115901"
+"1","
+"

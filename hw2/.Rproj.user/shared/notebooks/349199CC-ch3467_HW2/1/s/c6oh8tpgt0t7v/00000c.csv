@@ -1,0 +1,2 @@
+"0","points(which.min(t.bwd.summary$bic), t.bwd.summary$bic[which.min(t.bwd.summary$bic)],"
+"0","       pch = 2, col = ""red"", lwd = 2)"

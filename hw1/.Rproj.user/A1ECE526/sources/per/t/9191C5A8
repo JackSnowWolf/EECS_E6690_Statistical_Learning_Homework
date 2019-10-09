@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1569211613682.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3079062582",
+    "id" : "9191C5A8",
+    "lastKnownWriteTime" : 1569225584,
+    "last_content_update" : 1569225584,
+    "path" : "~/HuChong/Columbia/EECS_E6690_Statistical_Learning_in_Biological_Information_Systems/R_recitation/2019 R recitation/Recitation Session.rmd",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "22,3",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

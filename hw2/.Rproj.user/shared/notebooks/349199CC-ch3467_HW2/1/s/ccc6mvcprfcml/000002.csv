@@ -1,0 +1,7 @@
+"0","library(leaps)"
+"0","t.fwd<-regsubsets(y ~ poly(x, 10, raw = T), data=t.df, nvmax = 10,"
+"0","                  method = ""forward"")"
+"0","t.bwd<-regsubsets(y ~ poly(x, 10, raw = T), data=t.df, nvmax = 10,"
+"0","                  method = ""backward"")"
+"0","t.fwd.summary = summary(t.fwd)"
+"0","t.bwd.summary = summary(t.bwd)"

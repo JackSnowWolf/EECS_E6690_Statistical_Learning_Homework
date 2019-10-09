@@ -1,0 +1,5 @@
+"0","set.seed (1)"
+"0","train = sample(1: nrow(College.df), nrow(College.df)/2)"
+"0","test = (-train)"
+"0","College.test = College.df[test, ]"
+"0","College.train = College.df[train, ]"

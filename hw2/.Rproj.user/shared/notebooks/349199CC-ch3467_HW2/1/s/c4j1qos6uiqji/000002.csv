@@ -1,0 +1,2 @@
+"0","College.lasso = cv.glmnet(train_mat, College.train$Apps, alpha = 1)"
+"0","plot(College.lasso)"

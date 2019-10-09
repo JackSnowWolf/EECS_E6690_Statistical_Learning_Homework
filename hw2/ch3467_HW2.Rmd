@@ -1,0 +1,602 @@
+--- 
+title: "EECS E6690 hw2"
+author: "Chong Hu ch3467"
+date: 'Sep 22, 2019'
+output: 
+  pdf_document:
+    latex_engine: pdflatex
+header-includes: 
+- \usepackage{graphicx}
+- \usepackage{float}
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.pos = 'H')
+```
+
+\section*{P1}
+\begin{enumerate}
+    \item[(a)]  For Ridge regression optimization problem:
+    \begin{align*}
+        \hat{\beta}_1, \hat{\beta}_2 &= \arg \min_{\beta_1, \beta_2}  \mathbf{RSS} + \lambda \sum_{j=1}^{p} \beta_j^2\\
+        &= \arg \min_{\beta_1, \beta_2}  (y_1-\beta_1 x_{11} - \beta_2 x_{12})^2 + (y_2 - \beta_1 x_{21} -\beta_2 x_{22} )^2 + \lambda \beta_1^2 + \lambda \beta_2^2\\
+        &= \arg \min_{\beta_1, \beta_2} f(\beta_1, \beta_2)
+    \end{align*}
+    $f$ is concave w.r.t $\beta_1$ and $\beta_2$. Therefore, to minimize $f$, we need to set
+    \begin{align}
+        \frac{\partial f }{\partial \beta_1} &= -2x_{11} (y_1 - \beta_1 x_{11} - \beta_2 x_{12}) -2x_{21} (y_2 -\beta_1 x_{21} - \beta_2 x_{22}) + 2\lambda \beta_1 = 0 \\
+        \frac{\partial f }{\partial \beta_2} &= -2x_{12} (y_1 - \beta_1 x_{11} - \beta_2 x_{12}) -2x_{22} (y_2 -\beta_1 x_{21} - \beta_2 x_{22}) + 2\lambda \beta_2 = 0 
+    \end{align}
+    \item[(b)]
+    For convenience, simply note $x_1=x_{11}=x_{12}$  and $x_2=x_{21} = x_{22}$.\\
+    From (1):
+\begin{equation*}
+    (x_1^2+x_2^2+\lambda)\beta_1 + (x_1^2 +x_2^2)\beta_2 = x_1 y_1 +x_2 y_2
+\end{equation*}
+    From (2):
+\begin{equation*}
+    (x_1^2 + x_2^2) \beta_1 + (x_1^2 + x_2^2  +\lambda ) \beta_2 = x_1 y_1 + x_2 y_2
+\end{equation*}    
+
+Therefore,
+\begin{align*}
+    (x_1^2+x_2^2+\lambda)\beta_1 + (x_1^2 +x_2^2)\beta_2 &= (x_1^2 + x_2^2) \beta_1 + (x_1^2 + x_2^2  +\lambda ) \beta_2 \\
+    \lambda \beta_1 &=  \lambda \beta_2 
+\end{align*}
+Since $\lambda \neq 0$, $\hat{\beta}_1 = \hat{\beta}_2$.
+    \item[(c)]  For Lasso regression optimization problem:
+    \begin{align*}
+        \hat{\beta}_1, \hat{\beta}_2 &= \arg \min_{\beta_1, \beta_2}  \mathbf{RSS} + \lambda \sum_{j=1}^{p}\lvert\beta_j\rvert\\
+        &= \arg \min_{\beta_1, \beta_2}  (y_1-\beta_1 x_{11} - \beta_2 x_{12})^2 + (y_2 - \beta_1 x_{21} -\beta_2 x_{22} )^2 + \lambda \lvert \beta_1\rvert+ \lambda \lvert \beta_2 \rvert\\
+        &= \arg \min_{\beta_1, \beta_2} g(\beta_1, \beta_2)
+    \end{align*}
+    \item[(d)]  $g$ is concave w.r.t $\beta_1$ and $\beta_2$. Therefore, to minimize $f$, we need to set
+    \begin{align}
+        \frac{\partial g }{\partial \beta_1} &= 0 \\
+        \frac{\partial g }{\partial \beta_2} &= 0 
+    \end{align}
+    Based on the sign of $\beta_1$ and $\beta_2$, the partial derivative of $g$ will be different. Here I simply use $\pm \lambda$ to represent those cases. In (3), it depends on $\beta_1$; in (4), it depends on $\beta_2$.  When $\beta > 0$, it takes $+$; when $\beta < 0$, it takes $-$.
+        \begin{align*}
+        \frac{\partial g }{\partial \beta_1} &= -2x_{11} (y_1 - \beta_1 x_{11} - \beta_2 x_{12}) -2x_{21} (y_2 -\beta_1 x_{21} - \beta_2 x_{22}) \pm \lambda = 0 \\
+        \frac{\partial g }{\partial \beta_2} &= -2x_{12} (y_1 - \beta_1 x_{11} - \beta_2 x_{12}) -2x_{22} (y_2 -\beta_1 x_{21} - \beta_2 x_{22}) \pm \lambda = 0 
+    \end{align*}
+        For convenience, simply note $x_1=x_{11}=x_{12}$  and $x_2=x_{21} = x_{22}$.
+    \begin{align*}
+            (x_1^2+x_2^2)\beta_1 + (x_1^2 +x_2^2)\beta_2 &= x_1 y_1 +x_2 y_2 \pm \lambda \\
+            (x_1^2+x_2^2)\beta_1 + (x_1^2 +x_2^2)\beta_2 &= x_1 y_1 +x_2 y_2 \pm \lambda
+    \end{align*}
+    which have solutions when both $\beta_1 > 0 $ and $\beta_2 > 0$ or both $\beta_1 < 0 $ and $\beta_2 < 0$. When the equations have solutions, there multiple solutions since two equations provide same constrain. 
+    When both $\beta_1 > 0 $ and $\beta_2 > 0$, solutions are:
+    \begin{equation*}
+        (x_1^2+x_2^2)\beta_1 + (x_1^2 +x_2^2)\beta_2 = x_1 y_1 +x_2 y_2 - \lambda
+    \end{equation*}
+    When both $\beta_1 < 0 $ and $\beta_2 < 0$, solutions are:
+        \begin{equation*}
+        (x_1^2+x_2^2)\beta_1 + (x_1^2 +x_2^2)\beta_2 = x_1 y_1 +x_2 y_2 - \lambda
+    \end{equation*}
+\end{enumerate}
+
+\section*{P2}
+\subsection*{(a)}
+  With $p$ = 1, the loss will become $\bigg ( (y_1 - \beta_1)^2 + \lambda \beta_1^2 \bigg)$. I plot this term with respect to $\beta_1$ for different values of $y_1$ and $\lambda$. From the plot we can clear see that, the $\beta$ such that this term takes minimum is exactly the value of $\hat{\beta}_1^{R}$.
+
+```{r echo=FALSE, fig.height = 4.5, fig.width = 7, fig.align = "center", fig.cap="l2-Loss vs. $\\beta_1$ for different $y_1$ and $\\lambda$"}
+y_list = c(0, 0.2, 0.5, 0.8, 0.9)
+plot(0,0,xlim = c(-1,1.5),ylim = c(0,1),type = "n", xlab = "beta", ylab = "l2-loss")
+legends = c()
+for (i in 1:4){
+  y_1 = y_list[i]
+  for (lambda in c(0.1, 0.5, 1)){
+    beta = seq(-1,1.5, length=200)
+    loss = (y_1-beta)^2 + lambda * beta^2
+    lines(beta, loss, type="l", col=i, lwd=2)
+    abline(v = beta[which.min(loss)], col = "red")
+    beta_ridge = y_1 / (1+lambda)
+    print(sprintf("for y_1 %f lambda %f: ", y_1, lambda))
+    print(sprintf("beta ridge estimate : %f",  beta_ridge))
+    print(sprintf("beta ridge from graph  : %f",  beta[which.min(loss)]))
+  }
+  legends = append(legends, sprintf("y_1 = %0.2f ", y_1))
+}
+legend("bottomleft", legend = legends, col=1:4, lty=1)
+
+
+```
+\subsection*{(b)}
+With $p$ = 1, the loss will become $\bigg ( (y_1 - \beta_1)^2 + \lambda \lvert \beta_1 \rvert  \bigg)$. I plot this term with respect to $\beta_1$ for different values of $y_1$ and $\lambda$. From the plot we can clear see that, the $\beta$ such that this term takes minimum is exactly the value of $\hat{\beta}_1^{L}$.
+
+
+```{r echo=FALSE, fig.height = 5, fig.width = 8, fig.align = "center",  fig.cap="l1-Loss vs. $\\beta_1$ for different $y_1$ and $\\lambda$"}
+y_list = c(-0.5, -0.2, 0.5, 0.8)
+plot(0,0,xlim = c(-1,1.5),ylim = c(0,1),type = "n", xlab = "beta", ylab = "l2-loss")
+legends = c()
+for (i in 1:4){
+  y_1 = y_list[i]
+  for (lambda in c(0.1, 0.5, 1)){
+    beta = seq(-1,1.5, length=200)
+    loss = (y_1-beta)^2 + lambda * abs(beta)
+    lines(beta, loss, type="l", col=i, lwd=2)
+    abline(v = beta[which.min(loss)], col = "red")
+    if(y_1 > lambda/2){
+      beta_ridge = y_1 - lambda/2
+    }
+    else if (y_1 < -lambda/2){
+      beta_ridge = y_1 + lambda/2
+    }
+    else
+    {
+      beta_ridge = 0
+    }
+    print(sprintf("for y_1 %f lambda %f: ", y_1, lambda))
+    print(sprintf("beta ridge estimate : %f",  beta_ridge))
+    print(sprintf("beta ridge from graph  : %f",  beta[which.min(loss)]))
+  }
+  legends = append(legends, sprintf("y_1 = %0.2f ", y_1))
+}
+legend("bottomleft", legend = legends, col=1:4, lty = 1)
+
+
+```
+
+\section*{P3}
+\begin{enumerate}
+    \item[(a)] \begin{align*}
+        \mathrm{likelihood} = \mathcal{L}(\mathbf{y} \mid {\mathbf{X}, \boldsymbol{\beta}}, \sigma^2 ) &= \prod_{i = 1} ^n \mathbf{P}(y_i \mid {\mathbf{x}_i, \boldsymbol{\beta}, \sigma^2}) \\
+        &= \prod_{i = 1} ^n \frac{1}{\sqrt{2\pi \sigma^2}} \exp{\bigg(-\frac{1}{2\sigma^2} (y_i - \sum_{j=1}^{p}x_{ij} \beta_j - \beta_0  )^2 \bigg)}\\
+        &= (2\pi \sigma^2)^{-n/2} \exp{\bigg( -\frac{1}{2\sigma^2} \sum_{i=1}^{n} (y_i - \sum_{j=1}^{p}x_{ij} \beta_j - \beta_0  )^2  \bigg)}
+    \end{align*}
+    \item[(b)]
+    \begin{align*}
+        \mathrm{prior}(\boldsymbol{\beta}) &= \frac{1}{2 b} \exp{(-\frac{\sum_{j=1}^{p}\lvert \beta_j \rvert}{b})}
+    \end{align*}
+    \begin{align*}
+        \mathrm{posterior} & \propto \mathcal{L} \times \mathrm{prior}\\
+        & \propto (2\pi \sigma^2)^{-n/2} \exp{\bigg( -\frac{1}{2\sigma^2} \sum_{i=1}^{n} (y_i - \sum_{j=1}^{p}x_{ij} \beta_j - \beta_0  )^2  \bigg)}  \times \frac{1}{2 b} \exp{(-\frac{\sum_{j=1}^{p}\lvert \beta_j \rvert}{b})}\\
+        & \propto \frac{(2\pi \sigma^2)^{-n/2}}{2b} \exp{\bigg(-\frac{1}{2\sigma^2} \sum_{i=1}^{n} (y_i - \sum_{j=1}^{p}x_{ij} \beta_j - \beta_0  )^2 -\frac{\sum_{j=1}^{p}\lvert \beta_j \rvert}{b} \bigg)} \tag{$\ast$}
+    \end{align*}
+    \item[(c)] 
+    To find the mode of the posterior of $\boldsymbol{\beta}$, we need to find the maximum of $(*)$. Since $\exp{(x)}$ is an increasing function, we only need to find the minimum of 
+    \begin{equation*}
+        \bigg(\frac{1}{2\sigma^2} \sum_{i=1}^{n} (y_i - \sum_{j=1}^{p}x_{ij} \beta_j - \beta_0  )^2 +\frac{\sum_{j=1}^{p}\lvert \beta_j \rvert}{b} \bigg)
+    \end{equation*}
+    which means
+    \begin{equation*}
+        \boldsymbol{\hat{\beta}}_{\text{Lasso from Bayesian}} = \arg \min_{\boldsymbol{\beta}} \bigg(\frac{1}{2\sigma^2} \sum_{i=1}^{n} (y_i - \sum_{j=1}^{p}x_{ij} \beta_j - \beta_0  )^2 +\frac{\sum_{j=1}^{p}\lvert \beta_j \rvert}{b} \bigg) 
+    \end{equation*}
+    We also have 
+    \begin{equation*}
+        \tilde{\boldsymbol{\beta}}_{\text{Lasso}} = \arg \min_{\boldsymbol{\beta}} \bigg( \sum_{i=1}^{n} (y_i - \sum_{j=1}^{p}x_{ij} \beta_j - \beta_0  )^2 + \lambda \sum_{j=1}^{p}\lvert \beta_j \rvert \bigg)
+    \end{equation*}
+    Set $\lambda = \frac{2\sigma^2}{b}$, we can get:
+    \begin{equation*}
+        \tilde{\boldsymbol{\beta}}_{\text{Lasso}}  = \boldsymbol{\hat{\beta}}_{\text{Lasso from Bayesian}}
+    \end{equation*}
+    Hence, the lasso estimate is the mode for $\beta$ under this posterior distribution.
+    \item[(d)]
+    \begin{align*}
+        \mathrm{prior}(\boldsymbol{\beta}) &= \prod_{j=1}^{p} \mathbf{P} (\beta_j)\\
+        &= \prod_{j = 1} ^p \frac{1}{\sqrt{2\pi c}} \exp{\bigg(-\frac{\beta_j^2}{2c}  \bigg)}\\
+        &= (2\pi c)^{-n/2} \exp{\bigg( -\frac{1}{2c} \sum_{j=1}^p \beta_j^2 \bigg)}
+    \end{align*}
+    \begin{align*}
+        \mathrm{posterior} & \propto \mathcal{L} \times \mathrm{prior}\\
+        & \propto (2\pi \sigma^2)^{-n/2} \exp{\bigg( -\frac{1}{2\sigma^2} \sum_{i=1}^{n} (y_i - \sum_{j=1}^{p}x_{ij} \beta_j - \beta_0  )^2  \bigg)}  
+        \times (2\pi c)^{-n/2} \exp{\bigg( -\frac{1}{2c} \sum_{j=1}^p \beta_j^2 \bigg)}\\
+        &= (2\pi \sigma^2)^{-n/2} (2\pi c)^{-n/2} \exp{\bigg( -\frac{1}{2\sigma^2} \sum_{i=1}^{n} (y_i - \sum_{j=1}^{p}x_{ij} \beta_j - \beta_0  )^2 - \frac{1}{2c} \sum_{j=1}^p \beta_j^2 \bigg)}  
+    \end{align*}
+    \item[(e)]
+    Ignoring the multiplicative constant, we can have
+    \begin{equation*}
+        \text{posterior} \propto \exp{\bigg( -\frac{1}{2\sigma^2} \sum_{i=1}^{n} (y_i - \sum_{j=1}^{p}x_{ij} \beta_j - \beta_0  )^2 - \frac{1}{2c} \sum_{j=1}^p \beta_j^2 \bigg)} \tag{$\ast \ast$}
+    \end{equation*}
+    From ($\ast \ast$), we can clear see the posterior of $\beta$ is in the form of normal distribution, since for each $\beta_j$, there is a square term in exponential term which could be rearranged into $(\beta_j - \mu_{\beta_j})^2$. The multiplicative residual terms in  could be treated as variance and others can be treated as constant.  The mode and the mean for $\boldsymbol{\beta}$ under this posterior distribution are same value. In order to find the mode, we need to minimum
+    \begin{equation*}
+        \bigg( -\frac{1}{2\sigma^2} \sum_{i=1}^{n} (y_i - \sum_{j=1}^{p}x_{ij} \beta_j - \beta_0  )^2 - \frac{1}{2c} \sum_{j=1}^p \beta_j^2 \bigg)
+    \end{equation*}
+    Hence, 
+    \begin{equation*}
+        \boldsymbol{\hat{\beta}}_{\text{Ridge from Bayesian}} = \arg \min_{\boldsymbol{\beta}} \bigg( \frac{1}{2\sigma^2} \sum_{i=1}^{n} (y_i - \sum_{j=1}^{p}x_{ij} \beta_j - \beta_0  )^2 + \frac{1}{2c} \sum_{j=1}^p \beta_j^2 \bigg)
+    \end{equation*}
+    We also have 
+    \begin{equation*}
+        \tilde{\boldsymbol{\beta}}_{\text{Ridge}} = \arg \min_{\boldsymbol{\beta}} \bigg( \sum_{i=1}^{n} (y_i - \sum_{j=1}^{p}x_{ij} \beta_j - \beta_0  )^2 + \lambda  \sum_{j=1}^p \beta_j^2\bigg)
+    \end{equation*}
+    Set $\lambda = \frac{\sigma^2}{c}$, we can get:
+    \begin{equation*}
+        \tilde{\boldsymbol{\beta}}_{\text{Ridge}}  = \boldsymbol{\hat{\beta}}_{\text{Ridge from Bayesian}}
+    \end{equation*}
+    Hence, the ridge regression estimate is both the mode and the mean for $\boldsymbol{\beta}$ under this posterior distribution
+\end{enumerate}
+
+\section*{P4}
+\subsection*{(a)}
+```{r}
+set.seed(1)
+x = rnorm(100)
+epsilon = rnorm(100)
+```
+\subsection*{(b)}
+Here I take $\beta_0 = 0.2$, $\beta_1 = 0.6$, $\beta_2 = -0.1$ and $\beta_3 = 0.1$ and generate response vector $Y$.
+```{r}
+beta_0 = 0.2
+beta_1 = 0.6
+beta_2 = -0.1
+beta_3 = 0.1
+y = beta_0 + beta_1 * x + beta_2 * x^2 + beta_3 * x^3
+```
+\subsection*{(c)}
+
+```{r}
+library(leaps)
+t.df <- data.frame(y = y, x = x)
+t.full<-regsubsets(y ~ poly(x, 10, raw = T), data=t.df, nvmax = 10)
+t.summary = summary(t.full)
+```
+
+```{r,  fig.height = 4.5, fig.width = 5, fig.align = "center",  fig.cap="$\\boldsymbol{C_p}$ vs. Subset Size"}
+# find model for best Cp
+which.min(t.summary$cp)
+plot(t.summary$cp, xlab = "Subset Size", ylab = "Cp", col = "blue", pch = 2, type = "l")
+points(which.min(t.summary$cp), t.summary$cp[which.min(t.summary$cp)],
+       pch = 2, col = "red", lwd = 2)
+coefficients(t.full, id = which.min(t.summary$cp))
+```
+
+According to $C_p$, the best model contains $X, X^2, X^3, X^8, X^{10}$. Coefficients corresponding each terms are shown before.
+
+```{r,  fig.height = 4.5, fig.width = 5, fig.align = "center",  fig.cap="$\\boldsymbol{BIC}$ vs. Subset Size"}
+# find model for best BIC
+which.min(t.summary$bic)
+plot(t.summary$bic, xlab = "Subset Size", ylab = "BIC", col = "blue", pch = 2, type = "l")
+points(which.min(t.summary$bic), t.summary$bic[which.min(t.summary$bic)],
+       pch = 2, col = "red", lwd = 2)
+coefficients(t.full, id = which.min(t.summary$bic))
+```
+
+According to $BIC$, the best model contains $X, X^2, X^3, X^8, X^{10}$. Coefficients corresponding each terms are shown before.
+```{r,  fig.height = 4.5, fig.width = 5, fig.align = "center",  fig.cap="$adjusted\\ R^2$ vs. Subset Size"}
+# find model for best Adjusted R
+which.max(t.summary$adjr2)
+plot(t.summary$adjr2, xlab = "Subset Size", ylab = "adj R2", col = "blue", pch = 2, type = "l")
+points(which.max(t.summary$adjr2), t.summary$adjr2[which.max(t.summary$adjr2)],
+       pch = 2, col = "red", lwd = 2)
+coefficients(t.full, id = which.max(t.summary$adjr2))
+```
+According to $Adjusted\ R^2$, the best model contains $X, X^2, X^3$. Coefficients corresponding each terms are shown before.
+
+\subsection*{(d)}
+
+```{r}
+library(leaps)
+t.fwd<-regsubsets(y ~ poly(x, 10, raw = T), data=t.df, nvmax = 10,
+                  method = "forward")
+t.bwd<-regsubsets(y ~ poly(x, 10, raw = T), data=t.df, nvmax = 10,
+                  method = "backward")
+t.fwd.summary = summary(t.fwd)
+t.bwd.summary = summary(t.bwd)
+```
+
+
+```{r,  fig.height = 3.5, fig.width = 5, fig.align = "center",  fig.cap="$\\boldsymbol{C_p}$ vs. Subset Size for forward setpwise selection"}
+# find model for best Cp
+which.min(t.fwd.summary$cp)
+plot(t.fwd.summary$cp, xlab = "Subset Size", ylab = "Cp", col = "blue", pch = 2, type = "l")
+points(which.min(t.fwd.summary$cp), t.fwd.summary$cp[which.min(t.fwd.summary$cp)],
+       pch = 2, col = "red", lwd = 2)
+coefficients(t.fwd, id = which.min(t.fwd.summary$cp))
+```
+For forward stepwise selection, according to $C_p$, the best model contains $X, X^2, X^3, X^4,X^5, X^6, X^7, X^8, X^9, X^{10}$. Coefficients corresponding each terms are shown before.
+
+
+```{r,  fig.height = 3.5, fig.width = 5, fig.align = "center",  fig.cap="$\\boldsymbol{C_p}$ vs. Subset Size for backward setpwise selection"}
+# find model for best Cp
+which.min(t.bwd.summary$cp)
+plot(t.bwd.summary$cp, xlab = "Subset Size", ylab = "Cp", col = "blue", pch = 2, type = "l")
+points(which.min(t.bwd.summary$cp), t.bwd.summary$cp[which.min(t.bwd.summary$cp)],
+       pch = 2, col = "red", lwd = 2)
+coefficients(t.bwd, id = which.min(t.bwd.summary$cp))
+```
+For backward stepwise selection, according to $C_p$, the best model contains $X, X^2, X^3, X^8,  X^{10}$. Coefficients corresponding each terms are shown before. 
+
+FOr the forward stepwise selection, it has one more terms $X^4,X^5, X^6, X^7,X^9$, while for the backward stepwise selection, it is basically same as the result in (c).
+
+```{r,  fig.height = 3.5, fig.width = 5, fig.align = "center",  fig.cap="$\\boldsymbol{BIC}$ vs. Subset Size forward stepwise selection"}
+# find model for best BIC
+which.min(t.fwd.summary$bic)
+plot(t.fwd.summary$bic, xlab = "Subset Size", ylab = "BIC", col = "blue", pch = 2, type = "l")
+points(which.min(t.fwd.summary$bic), t.fwd.summary$bic[which.min(t.fwd.summary$bic)],
+       pch = 2, col = "red", lwd = 2)
+coefficients(t.fwd, id = which.min(t.fwd.summary$bic))
+```
+For forward stepwise selection, according to $BIC$, the best model contains $X, X^2, X^3, X^4 X^{10}$. Coefficients corresponding each terms are shown before.
+
+```{r,  fig.height = 3.5, fig.width = 5, fig.align = "center",  fig.cap="$\\boldsymbol{BIC}$ vs. Subset Size backward stepwise selection"}
+# find model for best BIC
+which.min(t.bwd.summary$bic)
+plot(t.bwd.summary$bic, xlab = "Subset Size", ylab = "BIC", col = "blue", pch = 2, type = "l")
+points(which.min(t.bwd.summary$bic), t.bwd.summary$bic[which.min(t.bwd.summary$bic)],
+       pch = 2, col = "red", lwd = 2)
+coefficients(t.bwd, id = which.min(t.bwd.summary$bic))
+```
+For backward stepwise selection, according to $BIC$, the best model contains $X, X^2, X^3,  X^8,  X^{10}$. Coefficients corresponding each terms are shown before.
+
+Compared with result in (c), the forward stepwise selection provides one more term $X^4$ and without term $X^8$, while for the backward stepwise selection, it is basically same as the result in (c).
+
+
+
+```{r,  fig.height = 3.5, fig.width = 5, fig.align = "center",  fig.cap="$adjusted\\ R^2$ vs. Subset Size for forward stepwise selection"}
+# find model for best Adjusted R
+which.max(t.fwd.summary$adjr2)
+plot(t.fwd.summary$adjr2, xlab = "Subset Size", ylab = "adj R2", col = "blue", pch = 2, type = "l")
+points(which.max(t.fwd.summary$adjr2), t.fwd.summary$adjr2[which.max(t.fwd.summary$adjr2)],
+       pch = 2, col = "red", lwd = 2)
+coefficients(t.fwd, id = which.max(t.fwd.summary$adjr2))
+```
+For forward stepwise selection, according to $Adjusted\ R^2$, the best model contains $X, X^2, X^3$. Coefficients corresponding each terms are shown before.
+
+```{r,  fig.height = 3.5, fig.width = 5, fig.align = "center",  fig.cap="$adjusted\\ R^2$ vs. Subset Size for backward stepwise selection"}
+# find model for best Adjusted R
+which.max(t.bwd.summary$adjr2)
+plot(t.bwd.summary$adjr2, xlab = "Subset Size", ylab = "adj R2", col = "blue", pch = 2, type = "l")
+points(which.max(t.bwd.summary$adjr2), t.bwd.summary$adjr2[which.max(t.bwd.summary$adjr2)],
+       pch = 2, col = "red", lwd = 2)
+coefficients(t.bwd, id = which.max(t.bwd.summary$adjr2))
+
+```
+
+For backward stepwise selection, according to $Adjusted\ R^2$, the best model contains $X, X^2, X^3$. Coefficients corresponding each terms are shown before.
+
+The forward stepwise selection model and backward selection model are same as the previous result in (c).
+
+\subsection*{(e)}
+
+```{r}
+library(glmnet)
+x_mat <- model.matrix(y ~ poly(x, 10, raw = T), data = t.df)[, -1]
+t.cv <-cv.glmnet(x_mat, y, alpha = 1)
+```
+```{r,  fig.height = 3.5, fig.width = 5, fig.align = "center",  fig.cap="Cross-Validation Error vs. $log(\\lambda)$ "}
+plot(t.cv)
+```
+
+
+```{r}
+t.cv$lambda.min
+coef(t.cv, t.cv$lambda.min)
+```
+
+```{r}
+t.cv$lambda.1se 
+coef(t.cv, t.cv$lambda.1se)
+```
+
+Here I find $\lambda$ that gives minimum mean cross-validated error is `r t.cv$lambda.min` and $\lambda$ that gives the most regularized model such that error is within one standard error of the minimum is `r t.cv$lambda.1se`.  While those two $\lambda$s are a litte different, coefficients are similar. The models have intercept and three terms $X, X^2, X^3$. However, there are a litte difference with the true values.
+
+\subsection*{(f)}
+```{r}
+beta_0 = 0.5
+beta_7 = 0.3
+y = beta_0 + beta_7 * x^7 + epsilon
+
+t2.df <- data.frame(y = y, x = x)
+t2.full<-regsubsets(y ~ poly(x, 10, raw = T), data=t2.df, nvmax = 10)
+t2.summary = summary(t2.full)
+```
+
+
+```{r}
+which.min(t2.summary$cp)
+coefficients(t2.full, id = which.min(t2.summary$cp))
+```
+
+```{r}
+which.min(t2.summary$bic)
+coefficients(t2.full, id = which.min(t2.summary$bic))
+```
+
+```{r}
+which.max(t2.summary$adjr2)
+coefficients(t2.full, id = which.min(t2.summary$adjr2))
+```
+
+From three standards, $C_p$, $BIC$ and $Adjusted\ R^2$, only $BIC$ could provid best model which has the same terms with true formula. The coefficients that model provides are not far away from true model.
+
+```{r}
+x_mat2 <- model.matrix(y ~ poly(x, 10, raw = T), data = t2.df)[, -1]
+t2.cv <-cv.glmnet(x_mat2, y, alpha = 1)
+t2.cv$lambda.min
+```
+
+```{r,  fig.height = 3.5, fig.width = 5, fig.align = "center",  fig.cap="Cross-Validation Error vs. $log(\\lambda)$ "}
+plot(t2.cv)
+```
+
+```{r}
+t2.full.mod = glmnet(x_mat2, y, alpha = 1)
+predict(t2.full.mod, s = t2.cv$lambda.min, type = "coefficients")
+```
+
+The lasso model will give `r t2.cv$lambda.min` as $\lambda$. Given that $\lambda$, the model will intercept and three terms $X^2, X^7, X^9$. While the intercept is not far away from true intercept and $\hat{\beta}_7$ is close to the true value, there are small uncessary coefficients $\beta_2, \beta_9$. Compared with lasso model, the predicted intercept for best subset selection is not quite close to the true value.
+
+\section*{P5}
+\subsection*{(a)}
+```{r}
+# load College data set.
+College.df <- read.csv("College.csv", header = T, row.names=1)
+# check na
+sum(is.na(College.df))
+```
+
+```{r}
+set.seed (1)
+train = sample(1: nrow(College.df), nrow(College.df)/2)
+test = (-train)
+College.test = College.df[test, ]
+College.train = College.df[train, ]
+```
+
+\subsection*{(b)}
+
+```{r}
+College.lm = lm(Apps~., data=College.train)
+summary(College.lm)
+mean((College.test$Apps - predict(College.lm, College.test) )^2)
+```
+
+Therefore, the test error is `r mean((College.test$Apps - predict(College.lm, College.test) )^2)`.
+
+\subsection*{(c)}
+```{r, fig.height = 3.5, fig.width = 5, fig.align = "center",  fig.cap="Cross-Validation Error vs. $log(\\lambda)$ for Ridge regression on College data"}
+train_mat <- model.matrix(Apps ~ ., data = College.train)
+test_mat <-  model.matrix(Apps ~ ., data = College.test)
+College.ridge = cv.glmnet(train_mat, College.train$Apps, alpha = 0)
+plot(College.ridge)
+College.ridge$lambda.min 
+coef(College.ridge, College.ridge$lambda.min )
+```
+Through Cross-Validation, we get $\lambda =$ `r College.ridge$lambda.min `.
+
+```{r}
+ridge.pred = predict(College.ridge, newx=test_mat, s=College.ridge$lambda.min)
+mean((College.test[, "Apps"] - ridge.pred)^2)
+```
+On the test data, the MSE is `r mean((College.test[, "Apps"] - ridge.pred)^2)`. MSE is slightly smaller than linear regression.
+
+\subsection*{(d)}
+```{r, fig.height = 3.5, fig.width = 5, fig.align = "center",  fig.cap="Cross-Validation Error vs. $log(\\lambda)$ for Lasso regression on College data"}
+College.lasso = cv.glmnet(train_mat, College.train$Apps, alpha = 1)
+plot(College.lasso)
+College.lasso$lambda.min 
+coef(College.lasso, College.lasso$lambda.min )
+```
+Through Cross-Validation, we get $\lambda =$  `r College.lasso$lambda.min `.
+
+```{r}
+lasso.pred = predict(College.lasso, newx=test_mat, s=College.lasso$lambda.min)
+mean((College.test[, "Apps"] - lasso.pred)^2)
+```
+On the test data, the MSE is `r mean((College.test[, "Apps"] - lasso.pred)^2)`, which is slightly smaller than linear regression and slightly bigger than ridge regression. The coefficients are shown before. All coefficients are non-zero  and the number of non-zero coefficients is 17 if we don't consider intercept.
+
+
+\section*{P6}
+\subsection*{(a)}
+```{r}
+set.seed(1)
+n = 1000
+p = 20
+X_mat =  matrix(rnorm(n * p), n, p)
+Beta = rnorm(p)
+Beta[3] = 0
+Beta[5] = 0
+Beta[7] = 0
+Beta[13] = 0
+Beta[17] = 0
+epsilon = rnorm(n)
+Y = X_mat %*% Beta + epsilon
+```
+Here I set some elements exactly equal to zero.
+
+\subsection*{(b)}
+```{r}
+set.seed(1)
+train = sample(1: 1000, 100)
+test = (-train)
+X_mat.train = X_mat[train, ]
+X_mat.test = X_mat[test, ]
+Y.train = Y[train, ]
+Y.test = Y[test, ]
+```
+
+\subsection*{(c)}
+```{r}
+d.full = regsubsets(y ~ ., data = data.frame(x = X_mat.train, y = Y.train), 
+                    nvmax = p)
+d.summary = summary(d.full)
+d.summary
+mse.train = rep(NA, p)
+x_cols = colnames(X_mat, do.NULL = FALSE, prefix = "x.")
+for(i in 1:p){
+  c_i = coef(d.full, id = i)
+  if(i > 1){
+    Y.train.pred = as.matrix(X_mat.train[, x_cols %in% names(c_i)] %*% 
+                               c_i[names(c_i) %in% x_cols])
+  }
+  else
+  {
+    Y.train.pred = as.matrix(X_mat.train[, x_cols %in% names(c_i)] * 
+                               c_i[names(c_i) %in% x_cols])
+  }
+  mse.train[i] = mean((Y.train - Y.train.pred)^2) 
+}
+```
+
+```{r , fig.height = 4, fig.width = 5, fig.align = "center",  fig.cap="MSE on training set associated with the best model of each size"}
+plot(mse.train, ylab = "Training MSE",xlab = "Subset Size", pch = 16, type = "b", col = "blue")
+```
+
+\subsection*{(d)}
+
+```{r}
+mse.test = rep(NA, p)
+x_cols = colnames(X_mat, do.NULL = FALSE, prefix = "x.")
+for(i in 1:p){
+  c_i = coef(d.full, id = i)
+  if(i > 1){
+    Y.test.pred = as.matrix(X_mat.test[, x_cols %in% names(c_i)] %*% 
+                               c_i[names(c_i) %in% x_cols])
+  }
+  else
+  {
+    Y.test.pred = as.matrix(X_mat.test[, x_cols %in% names(c_i)] * 
+                               c_i[names(c_i) %in% x_cols])
+  }
+  mse.test[i] = mean((Y.test - Y.test.pred)^2) 
+}
+```
+
+```{r , fig.height = 4, fig.width = 5, fig.align = "center",  fig.cap="MSE on test set associated with the best model of each size"}
+plot(mse.test, ylab = "test MSE",xlab = "Subset Size", pch = 16, type = "b", col = "blue")
+```
+\subsection*{(e)}
+```{r}
+which.min(mse.test)
+```
+The model with `r which.min(mse.test)` variables takes minimum MSE on test data set. Since the test set MSE is minimized for an intermediate model size, I don't need to re-generate data from step (a).
+\subsection*{(f)}
+```{r}
+coef(d.full, id = which.min(mse.test))
+Beta
+```
+Compared with true model, the model at which the test set MSE is minimized caught all zero $\beta$. But for other $\beta$s, the values are not quite close to the true value. 
+
+\subsection*{(g)}
+```{r,fig.height = 4, fig.width = 5, fig.align = "center",  fig.cap="Error Between Estimated and True Coefficients vs. Subset Size"}
+beta_err = rep(NA, p)
+x_cols = colnames(X_mat, do.NULL = FALSE, prefix = "x.")
+for(i in 1:p){
+  c_i = coef(d.full, id = i)
+  beta_err[i] = sqrt(sum((Beta[x_cols %in% names(c_i)] - c_i[names(c_i) %in% x_cols])^2))
+}
+plot(x = 1:p, y = beta_err, xlab = "Subset Size", ylab = "Error Between Estimated and True Coefficients")
+```
+
+```{r}
+which.min(beta_err)
+coef(d.full, id = which.min(beta_err))
+```
+The model at which the $\beta$ error is minimized is a model with one variable. This model is very different from the model from previous step. However, the curve we plot in this step is similar to the curve in previous step.
+
+```{r}
+which(beta_err == sort(beta_err)[2])
+coef(d.full, id = which(beta_err == sort(beta_err)[2]))
+```
+Then I check the model with second minimum $\beta$ error, which is a model with `r which(beta_err == sort(beta_err)[2])` variables. This model is still not the model we got in previous step (f), but the amount variables is increased compared with previous model.
+
+
+
+
+
+
+
+
+
