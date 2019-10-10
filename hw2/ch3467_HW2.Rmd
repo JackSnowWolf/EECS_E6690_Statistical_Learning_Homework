@@ -72,7 +72,7 @@ Since $\lambda \neq 0$, $\hat{\beta}_1 = \hat{\beta}_2$.
     \end{equation*}
     When both $\beta_1 < 0 $ and $\beta_2 < 0$, solutions are:
         \begin{equation*}
-        (x_1^2+x_2^2)\beta_1 + (x_1^2 +x_2^2)\beta_2 = x_1 y_1 +x_2 y_2 - \lambda
+        (x_1^2+x_2^2)\beta_1 + (x_1^2 +x_2^2)\beta_2 = x_1 y_1 +x_2 y_2 + \lambda
     \end{equation*}
 \end{enumerate}
 
@@ -189,7 +189,7 @@ legend("bottomleft", legend = legends, col=1:4, lty = 1)
     \begin{equation*}
         \text{posterior} \propto \exp{\bigg( -\frac{1}{2\sigma^2} \sum_{i=1}^{n} (y_i - \sum_{j=1}^{p}x_{ij} \beta_j - \beta_0  )^2 - \frac{1}{2c} \sum_{j=1}^p \beta_j^2 \bigg)} \tag{$\ast \ast$}
     \end{equation*}
-    From ($\ast \ast$), we can clear see the posterior of $\beta$ is in the form of normal distribution, since for each $\beta_j$, there is a square term in exponential term which could be rearranged into $(\beta_j - \mu_{\beta_j})^2$. The multiplicative residual terms in  could be treated as variance and others can be treated as constant.  The mode and the mean for $\boldsymbol{\beta}$ under this posterior distribution are same value. In order to find the mode, we need to minimum
+    From ($\ast \ast$), we can clear see the posterior of $\beta$ is in the form of normal distribution, since for each $\beta_j$, there is a square term in exponential term which could be rearranged into $(\beta_j - \mu_{\beta_j})^2$. The multiplicative residual terms in  could be treated as variance and others can be treated as constant.  The mode and the mean for $\boldsymbol{\beta}$ under this posterior distribution are same value. In order to find the mode, we need to maximize
     \begin{equation*}
         \bigg( -\frac{1}{2\sigma^2} \sum_{i=1}^{n} (y_i - \sum_{j=1}^{p}x_{ij} \beta_j - \beta_0  )^2 - \frac{1}{2c} \sum_{j=1}^p \beta_j^2 \bigg)
     \end{equation*}
