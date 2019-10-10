@@ -176,13 +176,13 @@ legend("bottomleft", legend = legends, col=1:4, lty = 1)
     \begin{align*}
         \mathrm{prior}(\boldsymbol{\beta}) &= \prod_{j=1}^{p} \mathbf{P} (\beta_j)\\
         &= \prod_{j = 1} ^p \frac{1}{\sqrt{2\pi c}} \exp{\bigg(-\frac{\beta_j^2}{2c}  \bigg)}\\
-        &= (2\pi c)^{-n/2} \exp{\bigg( -\frac{1}{2c} \sum_{j=1}^p \beta_j^2 \bigg)}
+        &= (2\pi c)^{-p/2} \exp{\bigg( -\frac{1}{2c} \sum_{j=1}^p \beta_j^2 \bigg)}
     \end{align*}
     \begin{align*}
         \mathrm{posterior} & \propto \mathcal{L} \times \mathrm{prior}\\
         & \propto (2\pi \sigma^2)^{-n/2} \exp{\bigg( -\frac{1}{2\sigma^2} \sum_{i=1}^{n} (y_i - \sum_{j=1}^{p}x_{ij} \beta_j - \beta_0  )^2  \bigg)}  
-        \times (2\pi c)^{-n/2} \exp{\bigg( -\frac{1}{2c} \sum_{j=1}^p \beta_j^2 \bigg)}\\
-        &= (2\pi \sigma^2)^{-n/2} (2\pi c)^{-n/2} \exp{\bigg( -\frac{1}{2\sigma^2} \sum_{i=1}^{n} (y_i - \sum_{j=1}^{p}x_{ij} \beta_j - \beta_0  )^2 - \frac{1}{2c} \sum_{j=1}^p \beta_j^2 \bigg)}  
+        \times (2\pi c)^{-p/2} \exp{\bigg( -\frac{1}{2c} \sum_{j=1}^p \beta_j^2 \bigg)}\\
+        &= (2\pi \sigma^2)^{-n/2} (2\pi c)^{-p/2} \exp{\bigg( -\frac{1}{2\sigma^2} \sum_{i=1}^{n} (y_i - \sum_{j=1}^{p}x_{ij} \beta_j - \beta_0  )^2 - \frac{1}{2c} \sum_{j=1}^p \beta_j^2 \bigg)}  
     \end{align*}
     \item[(e)]
     Ignoring the multiplicative constant, we can have
