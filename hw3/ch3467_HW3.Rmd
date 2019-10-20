@@ -1,0 +1,175 @@
+--- 
+title: "EECS E6690 hw3"
+author: "Chong Hu ch3467"
+date: 'Sep 22, 2019'
+output: 
+  pdf_document:
+    latex_engine: pdflatex
+header-includes: 
+- \usepackage{graphicx}
+- \usepackage{float}
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.pos = 'H')
+```
+
+\section*{P1}
+\begin{enumerate}
+    \item[(a)] \begin{align*}
+        \mathbb{P}[Y= \text{true}] &= \frac{\exp{(\hat{\beta}_0 + \hat{\beta}_1 X_1 + \hat{\beta}_2 X_2 )}}{1+ \exp{(\hat{\beta}_0 + \hat{\beta}_1 X_1 + \hat{\beta}_2 X_2 )}} \\
+        &= \frac{\exp{(-6 + 0.05 * 40 + 1 * 3.5)}}{1 + \exp{(-6 + 0.05 * 40 + 1 * 3.5)}} \\
+        & = 0.3775407
+    \end{align*}
+    Hence, $\mathbb{P}[Y= \text{true}] = 0.3775407$.
+    \item[(b)]
+    \begin{align*}
+        \mathbb{P}[Y= \text{true}] = \frac{\exp{(\hat{\beta}_0 + \hat{\beta}_1 X_1 + \hat{\beta}_2 X_2 )}}{1+ \exp{(\hat{\beta}_0 + \hat{\beta}_1 X_1 + \hat{\beta}_2 X_2 )}}  &= 0.5\\
+        \exp{(\hat{\beta}_0 + \hat{\beta}_1 X_1 + \hat{\beta}_2 X_2 )} &= 1\\
+        -6 + 0.05 * x_1 + 1* 3.5 &= 0\\
+        x_1 &= 50
+    \end{align*}
+     The student in part (a) need to study 50 hours to have a 50\% chance of getting an A in the class.
+\end{enumerate}
+
+\section*{P2}
+\begin{align*}
+    f_{\text{Yes}}(x) &= \frac{1}{\sqrt{2\pi \hat{\sigma} ^2}} \exp{- \frac{ (x - \mu_{\text{Yes}})^2}{2\hat{\sigma} ^2 }}\\
+    f_{\text{No}}(x) &= \frac{1}{\sqrt{2\pi \hat{\sigma} ^2}} \exp{- \frac{ (x - \mu_{\text{No}})^2}{2\hat{\sigma} ^2 }}\\
+    \mathbb{P}[Y = \text{Yes} \mid X = 4 ] &= \frac{\pi_{\text{Yes}} f_{\text{Yes}}(x)}{\pi_{\text{Yes}} f_{\text{Yes}}(x) + \pi_{\text{No}} f_{\text{No}}(x)}\\
+    &= \frac{0.8 * 0.04032845}{0.8* 0.04032845 + 0.2 * 0.05324133 }\\
+    &= 0.7518524
+\end{align*}
+
+\section*{P3}
+\begin{align*}
+    \text{likelihood} &= \prod_{i = 1} ^ n \bigg( \frac{\exp{(\beta_0 + \beta_1 x_i)}}{1+ \exp{(\beta_0 + \beta_1 x_i)}} \bigg)^{y_i} \bigg( \frac{1}{1+ \exp{(\beta_0 + \beta_1 x_i)}} \bigg)^{1- y_i}  \\
+    l(\beta_0, \beta_1) &= \sum_{i = 1}^{n} y_i (\beta_0 + \beta_1 x_i) - \ln{\big( 1+ \exp{(\beta_0 + \beta_1 x_i)} \big)}
+\end{align*}
+To maximize the likelihood, we need to set
+\begin{align*}
+    \frac{\partial  l(\beta_0, \beta_1)}{\partial \beta_0 } &= \sum_{i=1}^{n} \bigg( y_i - \frac{\exp{(\hat{ \beta}_0 + \hat{\beta}_1 x_i)}}{1+ \exp{( \hat{\beta}_0 + \hat{\beta}_1 x_i)}}\bigg) = 0 \\
+    \frac{\partial  l(\beta_0, \beta_1)}{\partial \beta_0 } &= \sum_{i=1}^{n} x_i \bigg( y_i - \frac{\exp{(\hat{ \beta}_0 + \hat{\beta}_1 x_i)}}{1+ \exp{( \hat{\beta}_0 + \hat{\beta}_1 x_i)}}\bigg) = 0
+\end{align*}
+
+Using the Newton–Raphson algorithm, I write all variables in matrix form. $\mathbf{W}$ is $n \times n$ diagonal matrix of weights with $i$th diagonal element $p(x;\beta^{\text{old}}) (1 - p(x; \beta^{\text{old}}))$.
+\begin{align*}
+    \mathbf{z} & = \mathbf{X} \beta^{\text{old}} + \mathbf{W} ^{-1} (\mathbf{y} - \mathbf{p})\\
+    \beta^{\text{new}} &= (\mathbf{X}^T \mathbf{WX})^ {-1} \mathbf{X}^T \mathbf{W} \mathbf{z} 
+\end{align*}
+Then we start with $\beta_0 = 0$ and $\beta_1 = 0$ and perform 10 iterations.
+```{r}
+library(matlib)
+```
+```{r}
+x = c(0.0, 0.2, 0.4, 0.6, 0.8 , 1.0)
+X = matrix(cbind(1, x), ncol = 2) 
+Y = matrix(c(0, 0, 0, 1, 0, 1), ncol = 1)
+beta_old = matrix(c(0, 0), ncol = 1)
+beta_new = beta_old
+for(i in 1:10){
+  p = exp(X %*% beta_old) / (1 + exp(X %*% beta_old))
+  w = as.vector(p * (1 - p))
+  W = diag(w)
+  z = X %*% beta_old + inv(W) %*% (Y - p)
+  beta_new = inv(t(X)  %*% W %*% X) %*% t(X) %*% W %*% z
+  beta_old = beta_new
+}
+beta_new
+```
+After 10 iterations, we can get $\hat{\beta}_0 =$ `r beta_new[1]` and $\hat{\beta}_1 =$ `r beta_new[2]`.
+
+\section*{P4}
+\section*{P5}
+\section*{P6}
+
+
+\section*{P7}
+```{r}
+library(ISLR)
+library(tree)
+attach(OJ)
+set.seed(1000)
+```
+
+\subsection*{(a)}
+```{r}
+train = sample(dim(OJ)[1], 800)
+OJ.train = OJ[train, ]
+OJ.test = OJ[-train, ]
+```
+
+\subsection*{(b)}
+```{r}
+mod.tr <- tree(Purchase ~ ., data = OJ.train)
+summary(mod.tr)
+```
+Training error rate for the tree is 0.16. The tree only use three variables `LoyalCH`, `PriceDiff` and `SalePriceMM`. There are 8 terminal nodes in the tree.
+
+## (c)
+```{r}
+mod.tr
+```
+
+Let's interpret the terminal node with "10)". The splitting variable of this node is `PriceDiff`. `PriceDiff < 0.05` will be predicted as `MM` for the response `Purchase`. There are 78 points in total below this node. The deviation of those points is 79.16.  0.20513% points  have `CH` as value for `Purchase` and 0.79487% points have `MM` as value for `purchase`. The * in the end means this is a terminal node.
+
+## (d)
+
+```{r, fig.height = 4.5, fig.width = 7, fig.align = "center",  fig.cap="Plot of the tree"}
+plot(mod.tr)
+text(mod.tr, pretty = 5)
+```
+Three split data points into two sets based on `LoyalCH < 0.5036` at the root.Then, the subtrees split data points into different leaves based on different conditions. Among those conditions, we can clearly see that variable `LoyalCH` is used very often. In the end, we get eight terminal nodes to predict response `Purchase` as `CH` or `MM`.
+
+## (e)
+
+```{r}
+mod.pred = predict(mod.tr, OJ.test, type = "class")
+err_rate = sum(OJ.test$Purchase != mod.pred) / dim(OJ.test)[1]
+print(sprintf("err rate: %.2f%% ",  err_rate*100))
+table(OJ.test$Purchase, mod.pred)
+```
+Error rate on test set is `r sprintf("%.2f%%",  err_rate*100)`.
+
+## (f)
+```{r}
+tree.cv = cv.tree(mod.tr, FUN = prune.tree)
+tree.cv
+```
+The optimal size is 8 based on deviation.
+
+## (g)
+```{r, fig.height = 4.5, fig.width = 6, fig.align = "center",  fig.cap="cross-validated classification error vs. Tree size"}
+plot(tree.cv$size, tree.cv$dev, col = "blue", pch = 3, 
+     type = "b", xlab = "Tree Size", ylab = "cross-validated classification error")
+```
+
+## (h)
+When the tree size is 8, cross-validation error is the lowest.
+
+## (i)
+```{r}
+tree.pruned = prune.tree(mod.tr, best = 8)
+tree.pruned
+```
+```{r}
+#  create a pruned tree with five terminal nodes.
+tree.pruned = prune.tree(mod.tr, best = 5)
+tree.pruned
+```
+
+## (j)
+```{r}
+summary(tree.pruned)
+```
+The error rate of pruned tree on training set is 19.62% while the error rate of unpruned tree is 16%. After pruning, the error rate on training set is becoming higher. This is because we are removing some nodes in the tree and  reducing the overfitting on trainning set.
+
+## (k)
+
+```{r}
+pruned.pred = predict(tree.pruned, OJ.test, type = "class")
+err_rate = sum(OJ.test$Purchase != pruned.pred) / dim(OJ.test)[1]
+print(sprintf("err rate: %.2f%% ",  err_rate*100))
+```
+The error rate of pruned tree on training set is 21.11% while the error rate of unpruned tree is 18.15%. In this scenario, the error rate of pruned tree is higher.
+
