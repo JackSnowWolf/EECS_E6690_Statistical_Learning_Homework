@@ -49,7 +49,7 @@ knitr::opts_chunk$set(echo = TRUE, fig.pos = 'H')
 To maximize the likelihood, we need to set
 \begin{align*}
     \frac{\partial  l(\beta_0, \beta_1)}{\partial \beta_0 } &= \sum_{i=1}^{n} \bigg( y_i - \frac{\exp{(\hat{ \beta}_0 + \hat{\beta}_1 x_i)}}{1+ \exp{( \hat{\beta}_0 + \hat{\beta}_1 x_i)}}\bigg) = 0 \\
-    \frac{\partial  l(\beta_0, \beta_1)}{\partial \beta_0 } &= \sum_{i=1}^{n} x_i \bigg( y_i - \frac{\exp{(\hat{ \beta}_0 + \hat{\beta}_1 x_i)}}{1+ \exp{( \hat{\beta}_0 + \hat{\beta}_1 x_i)}}\bigg) = 0
+    \frac{\partial  l(\beta_0, \beta_1)}{\partial \beta_1 } &= \sum_{i=1}^{n} x_i \bigg( y_i - \frac{\exp{(\hat{ \beta}_0 + \hat{\beta}_1 x_i)}}{1+ \exp{( \hat{\beta}_0 + \hat{\beta}_1 x_i)}}\bigg) = 0
 \end{align*}
 
 Using the Newton–Raphson algorithm, I write all variables in matrix form. $\mathbf{W}$ is $n \times n$ diagonal matrix of weights with $i$th diagonal element $p(x;\beta^{\text{old}}) (1 - p(x; \beta^{\text{old}}))$.
@@ -93,7 +93,8 @@ Since $\mathbf{\Sigma}$ is symmetric, we can get
 \begin{equation*}
     \mathbf{\Sigma} = \mathbf{Q} \mathbf{\Lambda} \mathbf{Q}^T
 \end{equation*}
-where $\mathbf{Q}$ is an orthogonal matrix whose columns are the eigenvectors of $\mathbf{\Sigma}$, and $\Lambda$ is a diagonal matrix whose entries are the eigenvalues of $\mathbf{\Sigma}$.\\
+where $\mathbf{Q}$ is an orthogonal matrix whose columns are the eigenvectors of $\mathbf{\Sigma}$, and $\Lambda$ is a diagonal matrix whose entries are the eigenvalues of $\mathbf{\Sigma}$. 
+in
 And,
 \begin{equation*}
     \mathbf{Q} \mathbf{Q}^T = \mathbf{I}
@@ -144,7 +145,6 @@ Therefore,
   \end{array}} \right]
 \end{align*}
 
-
 \section*{P5}
 Since
 \begin{align*}
@@ -174,15 +174,21 @@ Then,
     &=\sum_{k=1}^K  \alpha_k^2 \mathrm{Var} \big[ \hat{\sigma}_k^2 \big]\\
     &= \sum_{k=1}^K  \alpha_k^2 \frac{2 \sigma^4}{n_k-1} \\
     &= 2 \sigma^4 \sum_{k=1}^K \frac{ \alpha_k^2}{n_k-1} \\
-    &=  \frac{2\sigma^4}{n-K} \sum_{k=1}^K \alpha_k^2 \frac{n-K}{n_k-1} \\
+    &= 2 \sigma^4 \sum_{k=1}^K \frac{ \alpha_k^2}{n_k-1} * 1 \\
+    &=  2 \sigma^4 \sum_{k=1}^K \frac{ \alpha_k^2}{n_k-1} * \sum_{k=1}^{K} \frac{n_k-1}{K-1} \\
     \text{where\ } &  \sum_{k=1}^K \alpha_k = 1 \\
     \text{and\ } &  \sum_{k=1}^K \frac{n_k-1}{n-K} = 1 \\
-    \text{Based\ on\ Jensen's\ } & \text{ inequality,\ we\ can\ get }\\
-    & \geq \frac{2\sigma^4}{n-K}
+    &= \frac{2 \sigma^4}{K-1}  \sum_{k=1}^K \frac{ \alpha_k^2}{n_k-1} * \sum_{k=1}^{K}n_k-1
+\end{align*} 
+Based on \texttt{Cauchy-Schwarz\ inequality},
+\begin{align*}
+    \mathrm{Var}\big[\hat{\sigma}^4 \big] &=   \frac{2 \sigma^2}{K-1}  \sum_{k=1}^K \frac{ \alpha_k^2}{n_k-1} * \sum_{k=1}^{K}n_k-1\\
+    & \geq \frac{2 \sigma^4}{K-1} \Bigg( \sum_{k=1}^K \sqrt{\frac{\alpha_k^2}{\sqrt{n_k-1}} * \sqrt{n_k-1}} \Bigg)^2\\
+    &=  \frac{2 \sigma^4}{K-1} \bigg( \sum_{k=1}^K \alpha_k \bigg)\\
+    &=  \frac{2 \sigma^4}{K-1} 
 \end{align*}
 where equality happens if and only if $\alpha_k = (n_k-1)/(n-K)$.
 Therefore, the variance of $\hat{\sigma}^2$ is minimized when $\alpha_k = (n_k-1)/(n-K)$.
-
 
 \section*{P6}
 Through majority vote approach, six out of ten estimates are this class is Red. Therefore, the final classification is Red.
