@@ -80,8 +80,113 @@ beta_new
 After 10 iterations, we can get $\hat{\beta}_0 =$ `r beta_new[1]` and $\hat{\beta}_1 =$ `r beta_new[2]`.
 
 \section*{P4}
+\begin{align*}
+    \mathrm{Cov}[\mathbf{Y}] &= \mathrm{Cov}[\mathbf{AX}]\\
+    &= \mathbf{A} \text{Cov}[\mathbf{X}] \mathbf{A}^T\\
+    &= \mathbf{A} \mathbf{\Sigma} \mathbf{A}^T
+\end{align*}
+Then, since $\text{cov}[\mathbf{Y}]$ is an identity matrix, we have 
+\begin{align*}
+    \mathbf{A} \mathbf{\Sigma} \mathbf{A}^T &= \mathbf{I}
+\end{align*}
+Since $\mathbf{\Sigma}$ is symmetric, we can get
+\begin{equation*}
+    \mathbf{\Sigma} = \mathbf{Q} \mathbf{\Lambda} \mathbf{Q}^T
+\end{equation*}
+where $\mathbf{Q}$ is an orthogonal matrix whose columns are the eigenvectors of $\mathbf{\Sigma}$, and $\Lambda$ is a diagonal matrix whose entries are the eigenvalues of $\mathbf{\Sigma}$.\\
+And,
+\begin{equation*}
+    \mathbf{Q} \mathbf{Q}^T = \mathbf{I}
+\end{equation*}
+Then,
+\begin{align*}
+    \mathbf{A} \mathbf{Q} \mathbf{\Lambda} \mathbf{Q}^T \mathbf{A}^T &= \mathbf{I} \\
+    (\mathbf{A} \mathbf{Q}) \mathbf{\Lambda} (\mathbf{A} \mathbf{Q} )^T &= \mathbf{I}\\
+    \mathbf{A} \mathbf{Q} &= (\mathbf{\Lambda}^{-1})^{\frac{1}{2}} \\
+    \mathbf{A} &=  (\mathbf{\Lambda}^{-1})^{\frac{1}{2}} \mathbf{Q}^{-1} \\
+\end{align*}
+\begin{align*}
+        \mathbf{\Lambda} &=  
+  \left[ {\begin{array}{cc}
+  \sigma_1^2/2 - (4*\rho^2\sigma_1^2\sigma_2^2 + \sigma_1^4 - 2\sigma_1^2\sigma_2^2 + \sigma_2^4)^{1/2}/2 + \sigma_2^2/2 &  \\
+  0 & \\
+  \end{array} }\right. \\
+  &
+  \left. {\begin{array}{cc}
+  & 0
+     \\
+      & (4\rho^2\sigma_1^2\sigma_2^2 + \sigma_1^4 - 2\sigma_1^2\sigma_2^2 + \sigma_2^4)^{1/2}/2 + \sigma_1^2/2 + \sigma_2^2/2 \\
+  \end{array}} \right] \\
+  \mathbf{Q} &=  
+  \left[ {\begin{array}{cc}
+  (\sigma_1^2/2 - (4\rho^2\sigma_1^2\sigma_2^2 + \sigma_1^4 - 2\sigma_1^2\sigma_2^2 + \sigma_2^4)^{1/2}/2 + \sigma_2^2/2)/(\rho\sigma_1\sigma_2) - \sigma_2/(\rho\sigma_1) &  \\
+  1 & \\
+  \end{array} }\right. \\
+  &
+  \left. {\begin{array}{cc}
+  & ((4\rho^2\sigma_1^2\sigma_2^2 + \sigma_1^4 - 2\sigma_1^2\sigma_2^2 + \sigma_2^4)^{1/2}/2 + \sigma_1^2/2 + \sigma_2^2/2)/(\rho\sigma_1\sigma_2) - \sigma_2/(\rho\sigma_1) 
+     \\
+      & 1 \\
+  \end{array}} \right]
+\end{align*}
+Therefore,
+\begin{align*}
+  \mathbf{A} &=  
+  \left[ {\begin{array}{cc}
+- \frac{ (2^{1/2}\rho\sigma_1\sigma_2(1/(\sigma_1^2 - (4*\rho^2*\sigma_1^2\sigma_2^2 + \sigma_1^4 - 2\sigma_1^2\sigma_2^2 + \sigma_2^4)^{1/2} + \sigma_2^2))^{1/2})}{(4*\rho^2\sigma_1^2\sigma_2^2 + \sigma_1^4 - 2\sigma_1^2\sigma_2^2 + \sigma_2^4)^{1/2}} &  \\
+  \frac{2^{1/2}\rho\sigma_1\sigma_2(1/((4\rho^2\sigma_1^2\sigma_2^2 + \sigma_1^4 - 2\sigma_1^2\sigma_2^2 + \sigma_2^4)^{1/2} + \sigma_1^2 + \sigma_2^2))^{1/2})}{(4\rho^2\sigma_1^2\sigma_2^2 + \sigma_1^4 - 2\sigma_1^2\sigma_2^2 + \sigma_2^4)^{1/2}} & \\
+  \end{array} }\right. \\
+  &
+  \left. {\begin{array}{cc}
+  & \frac{ (2^{1/2}*(1/(\sigma_1^2 - (4\rho^2\sigma_1^2\sigma_2^2 + \sigma_1^4 - 2\sigma_1^2\sigma_2^2 + \sigma_2^4)^(1/2) + \sigma_2^2))^{1/2}((4\rho^2\sigma_1^2\sigma_2^2 + \sigma_1^4 - 2\sigma_1^2\sigma_2^2 + \sigma_2^4)^{1/2} + \sigma_1^2 - \sigma_2^2))}{(2(4\rho^2\sigma_1^2\sigma_2^2 + \sigma_1^4 - 2\sigma_1^2\sigma_2^2 + \sigma_2^4)^{1/2})}
+     \\
+      & \frac{(2^{1/2}*(1/((4\rho^2\sigma_1^2\sigma_2^2 + \sigma_1^4 - 2\sigma_1^2\sigma_2^2 + \sigma_2^4)^{1/2} + \sigma_1^2 + \sigma_2^2))^{1/2}((4\rho^2\sigma_1^2\sigma_2^2 + \sigma_1^4 - 2\sigma_1^2\sigma_2^2 + \sigma_2^4)^{1/2} - \sigma_1^2 + \sigma_2^2))}{(2(4\rho^2\sigma_1^2\sigma_2^2 + \sigma_1^4 - 2\sigma_1^2\sigma_2^2 + \sigma_2^4)^{1/2})} \\
+  \end{array}} \right]
+\end{align*}
+
+
 \section*{P5}
+Since
+\begin{align*}
+    \hat{\mu}_k = \frac{1}{n_k} \sum_{i:\ y_i = k} x_i \quad\text{and}\quad \hat{\sigma}_k^2 = \frac{1}{n_k-1} \sum_{i:\ y_i = k} (x_i -\hat{\mu}_k)^2
+\end{align*}
+and under the Gaussian assumption, the variance of each population is $\sigma^2$, we can easily get
+ \begin{align*}
+     \mathbb{E}[\hat{\sigma}_k^2] = \sigma^2
+ \end{align*}
+Hence, 
+\begin{align*}
+     \mathbb{E}[\hat{\sigma}^2] &= \mathbb{E}\bigg[\sum_{k=1}^K \alpha_k \hat{\sigma}_k^2 \bigg] = \sum_{k=1}^K \alpha_k\mathbb{E}\big[ \hat{\sigma}_k^2\big] \\
+     &= \sigma^2 \sum_{k=1}^K \alpha_k = \sigma^2
+\end{align*}
+Also, under the Gaussian assumptions, we have
+\begin{align*}
+    \frac{(n_k-1) \hat{\sigma}_k^2}{\sigma^2} & \sim  \mathcal{X}_{n_k-1}^2 \\
+    \mathrm{Var}\bigg[ \frac{(n_k-1) \hat{\sigma}_k^2}{\sigma^2} \bigg] &= \mathrm{Var} \big[\mathcal{X}_{n_k-1}\big] \\
+    \frac{(n_k-1)^2 }{\sigma^4} \mathrm{Var} [\hat{\sigma}_k^2] &= 2(n_k-1)\\
+    \mathrm{Var} [\hat{\sigma}_k^2] &= \frac{2 \sigma^4}{n_k-1}
+\end{align*}
+
+
+Then, 
+\begin{align*}
+    \mathrm{Var}\big[\hat{\sigma}^2 \big] &= \mathrm{Var}\bigg[\sum_{k=1}^K \alpha_k \hat{\sigma}_k^2 \bigg]\\
+    &=\sum_{k=1}^K  \alpha_k^2 \mathrm{Var} \big[ \hat{\sigma}_k^2 \big]\\
+    &= \sum_{k=1}^K  \alpha_k^2 \frac{2 \sigma^4}{n_k-1} \\
+    &= 2 \sigma^4 \sum_{k=1}^K \frac{ \alpha_k^2}{n_k-1} \\
+    &=  \frac{2\sigma^4}{n-K} \sum_{k=1}^K \alpha_k^2 \frac{n-K}{n_k-1} \\
+    \text{where\ } &  \sum_{k=1}^K \alpha_k = 1 \\
+    \text{and\ } &  \sum_{k=1}^K \frac{n_k-1}{n-K} = 1 \\
+    \text{Based\ on\ Jensen's\ } & \text{ inequality,\ we\ can\ get }\\
+    & \geq \frac{2\sigma^4}{n-K}
+\end{align*}
+where equality happens if and only if $\alpha_k = (n_k-1)/(n-K)$.
+Therefore, the variance of $\hat{\sigma}^2$ is minimized when $\alpha_k = (n_k-1)/(n-K)$.
+
+
 \section*{P6}
+Through majority vote approach, six out of ten estimates are this class is Red. Therefore, the final classification is Red.
+Through average probability, the average estimate is 0.45, therefore the final classification is Green.
 
 
 \section*{P7}
