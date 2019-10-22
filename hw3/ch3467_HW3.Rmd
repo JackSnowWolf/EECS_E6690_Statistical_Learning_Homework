@@ -162,7 +162,7 @@ Hence,
 Also, under the Gaussian assumptions, we have
 \begin{align*}
     \frac{(n_k-1) \hat{\sigma}_k^2}{\sigma^2} & \sim  \mathcal{X}_{n_k-1}^2 \\
-    \mathrm{Var}\bigg[ \frac{(n_k-1) \hat{\sigma}_k^2}{\sigma^2} \bigg] &= \mathrm{Var} \big[\mathcal{X}_{n_k-1}\big] \\
+    \mathrm{Var}\bigg[ \frac{(n_k-1) \hat{\sigma}_k^2}{\sigma^2} \bigg] &= \mathrm{Var} \big[\mathcal{X}_{n_k-1}^2\big] \\
     \frac{(n_k-1)^2 }{\sigma^4} \mathrm{Var} [\hat{\sigma}_k^2] &= 2(n_k-1)\\
     \mathrm{Var} [\hat{\sigma}_k^2] &= \frac{2 \sigma^4}{n_k-1}
 \end{align*}
@@ -178,14 +178,14 @@ Then,
     &=  2 \sigma^4 \sum_{k=1}^K \frac{ \alpha_k^2}{n_k-1} * \sum_{k=1}^{K} \frac{n_k-1}{K-1} \\
     \text{where\ } &  \sum_{k=1}^K \alpha_k = 1 \\
     \text{and\ } &  \sum_{k=1}^K \frac{n_k-1}{n-K} = 1 \\
-    &= \frac{2 \sigma^4}{K-1}  \sum_{k=1}^K \frac{ \alpha_k^2}{n_k-1} * \sum_{k=1}^{K}n_k-1
+    &= \frac{2 \sigma^4}{n-K}  \sum_{k=1}^K \frac{ \alpha_k^2}{n_k-1} * \sum_{k=1}^{K}n_k-1
 \end{align*} 
 Based on \texttt{Cauchy-Schwarz\ inequality},
 \begin{align*}
-    \mathrm{Var}\big[\hat{\sigma}^4 \big] &=   \frac{2 \sigma^2}{K-1}  \sum_{k=1}^K \frac{ \alpha_k^2}{n_k-1} * \sum_{k=1}^{K}n_k-1\\
-    & \geq \frac{2 \sigma^4}{K-1} \Bigg( \sum_{k=1}^K \sqrt{\frac{\alpha_k^2}{\sqrt{n_k-1}} * \sqrt{n_k-1}} \Bigg)^2\\
-    &=  \frac{2 \sigma^4}{K-1} \bigg( \sum_{k=1}^K \alpha_k \bigg)\\
-    &=  \frac{2 \sigma^4}{K-1} 
+    \mathrm{Var}\big[\hat{\sigma}^4 \big] &=   \frac{2 \sigma^2}{n-K}  \sum_{k=1}^K \frac{ \alpha_k^2}{n_k-1} * \sum_{k=1}^{K}n_k-1\\
+    & \geq \frac{2 \sigma^4}{n-K} \Bigg( \sum_{k=1}^K \sqrt{\frac{\alpha_k^2}{\sqrt{n_k-1}} * \sqrt{n_k-1}} \Bigg)^2\\
+    &=  \frac{2 \sigma^4}{n-K} \bigg( \sum_{k=1}^K \alpha_k \bigg)\\
+    &=  \frac{2 \sigma^4}{n-K} 
 \end{align*}
 where equality happens if and only if $\alpha_k = (n_k-1)/(n-K)$.
 Therefore, the variance of $\hat{\sigma}^2$ is minimized when $\alpha_k = (n_k-1)/(n-K)$.
