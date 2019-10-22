@@ -183,7 +183,7 @@ Then,
 Based on \texttt{Cauchy-Schwarz\ inequality},
 \begin{align*}
     \mathrm{Var}\big[\hat{\sigma}^4 \big] &=   \frac{2 \sigma^2}{n-K}  \sum_{k=1}^K \frac{ \alpha_k^2}{n_k-1} * \sum_{k=1}^{K}n_k-1\\
-    & \geq \frac{2 \sigma^4}{n-K} \Bigg( \sum_{k=1}^K \sqrt{\frac{\alpha_k^2}{\sqrt{n_k-1}} * \sqrt{n_k-1}} \Bigg)^2\\
+    & \geq \frac{2 \sigma^4}{n-K} \Bigg( \sum_{k=1}^K \frac{\alpha_k}{\sqrt{n_k-1}} * \sqrt{n_k-1} \Bigg)^2\\
     &=  \frac{2 \sigma^4}{n-K} \bigg( \sum_{k=1}^K \alpha_k \bigg)\\
     &=  \frac{2 \sigma^4}{n-K} 
 \end{align*}
